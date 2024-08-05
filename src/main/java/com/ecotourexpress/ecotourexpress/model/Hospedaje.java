@@ -1,10 +1,6 @@
 package com.ecotourexpress.ecotourexpress.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -22,8 +18,8 @@ public class Hospedaje {
     private int Capacidad;
 
     @Column
-    private int Disponibilidad; // Cambia el tipo si es necesario
+    private int Disponibilidad;
 
     @Column
-    private double Precio_hab;
+    private int Precio_hab; // Precio en pesos (COP)
 }

@@ -16,10 +16,10 @@ public class Actividad {
     private String Nombre_act;
 
     @Column
-    private int Duración_act;
+    private int Duración_act; // Duración en horas
 
     @Column
-    private double Precio_act;
+    private int Precio_act; // Precio en pesos (COP)
 
     @ManyToMany(mappedBy = "actividades")
     private List<Cliente> clientes;

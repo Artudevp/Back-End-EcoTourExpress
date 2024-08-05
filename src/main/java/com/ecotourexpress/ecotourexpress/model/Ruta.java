@@ -1,12 +1,7 @@
 package com.ecotourexpress.ecotourexpress.model;
 
 import java.util.List;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -21,10 +16,10 @@ public class Ruta {
     private String Nombre_ruta;
 
     @Column
-    private int Duración_ruta;
+    private int Duración_ruta; // Duración en horas
 
     @Column
-    private double Precio;
+    private int Precio; // Precio en pesos (COP)
 
     @ManyToMany(mappedBy = "rutas")
     private List<Cliente> clientes;

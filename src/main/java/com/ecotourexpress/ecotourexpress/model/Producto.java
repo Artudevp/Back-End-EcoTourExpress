@@ -1,10 +1,6 @@
 package com.ecotourexpress.ecotourexpress.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -22,7 +18,7 @@ public class Producto {
     private String Nombre_P;
 
     @Column
-    private double Precio_P;
+    private int Precio_P; // Precio en pesos (COP)
 
     @Column
     private int Cantidad_disponible;
