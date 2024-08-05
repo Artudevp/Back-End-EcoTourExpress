@@ -1,12 +1,7 @@
 package com.ecotourexpress.ecotourexpress.model;
 
 import java.util.List;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -32,3 +27,4 @@ public class Actividad {
     @ManyToMany(mappedBy = "actividades")
     private List<Ruta> rutas;
 }
+
