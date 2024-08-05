@@ -27,4 +27,3 @@ public class Actividad {
     @ManyToMany(mappedBy = "actividades")
     private List<Ruta> rutas;
 }
-
