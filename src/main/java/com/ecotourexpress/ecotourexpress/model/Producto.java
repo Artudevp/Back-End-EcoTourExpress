@@ -15,10 +15,10 @@ public class Producto {
     private String Categoria;
 
     @Column
-    private String Nombre_P;
+    private String Nombre_p;
 
     @Column
-    private int Precio_P; // Precio en pesos (COP)
+    private int Precio_p;
 
     @Column
     private int Cantidad_disponible;

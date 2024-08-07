@@ -1,6 +1,8 @@
 package com.ecotourexpress.ecotourexpress.service;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ecotourexpress.ecotourexpress.model.Hospedaje;
@@ -18,6 +20,10 @@ public class HospedajeService {
 
     public List<Hospedaje> getAllHospedajes() {
         return (List<Hospedaje>) hospedajeRepository.findAll();
+    }
+
+    public Optional<Hospedaje> getHospedajeById(int id) {
+        return hospedajeRepository.findById(id);
     }
 
     public void deleteHospedaje(int id) {

@@ -1,6 +1,8 @@
 package com.ecotourexpress.ecotourexpress.service;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ecotourexpress.ecotourexpress.model.Actividad;
@@ -18,6 +20,10 @@ public class ActividadService {
 
     public List<Actividad> getAllActividades() {
         return (List<Actividad>) actividadRepository.findAll();
+    }
+
+    public Optional<Actividad> getActividadById(int id) {
+        return actividadRepository.findById(id);
     }
 
     public void deleteActividad(int id) {

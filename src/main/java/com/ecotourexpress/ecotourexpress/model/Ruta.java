@@ -21,9 +21,19 @@ public class Ruta {
     @Column
     private int Precio; // Precio en pesos (COP)
 
-    @ManyToMany(mappedBy = "rutas")
+    @ManyToMany
+    @JoinTable(
+        name = "ruta_cliente",
+        joinColumns = @JoinColumn(name = "ID_ruta"),
+        inverseJoinColumns = @JoinColumn(name = "ID_cliente")
+    )
     private List<Cliente> clientes;
 
     @ManyToMany
+    @JoinTable(
+        name = "ruta_actividad",
+        joinColumns = @JoinColumn(name = "ID_ruta"),
+        inverseJoinColumns = @JoinColumn(name = "ID_actividad")
+    )
     private List<Actividad> actividades;
 }

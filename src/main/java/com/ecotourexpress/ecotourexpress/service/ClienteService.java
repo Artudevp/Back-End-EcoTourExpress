@@ -1,12 +1,17 @@
 package com.ecotourexpress.ecotourexpress.service;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.ecotourexpress.ecotourexpress.model.Cliente;
 import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.repository.ClienteRepository;
 import com.ecotourexpress.ecotourexpress.repository.ActividadRepository;
+import exception.ResourceNotFoundException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClienteService {
@@ -22,11 +27,13 @@ public class ClienteService {
     }
 
     public List<Cliente> getAllClientes() {
-        return (List<Cliente>) clienteRepository.findAll();
+        List<Cliente> clientes = new ArrayList<>();
+        clienteRepository.findAll().forEach(clientes::add);
+        return clientes;
     }
 
-    public Cliente getClienteById(int id) {
-        return clienteRepository.findById(id).orElse(null);
+    public Optional<Cliente> getClienteById(int id) {
+        return clienteRepository.findById(id);
     }
 
     public void deleteCliente(int id) {
@@ -34,26 +41,26 @@ public class ClienteService {
     }
 
     public Cliente addActividadesToCliente(int id_cliente, List<Actividad> actividades) {
-        Cliente cliente = clienteRepository.findById(id_cliente).orElse(null);
-        if (cliente != null) {
-            cliente.setActividades(actividades);
-            clienteRepository.save(cliente);
+        Cliente cliente = clienteRepository.findById(id_cliente)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+        for (Actividad actividad : actividades) {
+            Actividad act = actividadRepository.findById(actividad.getID_actividad())
+                    .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + actividad.getID_actividad()));
+            cliente.getActividades().add(act);
         }
-        return cliente;
+        return clienteRepository.save(cliente);
     }
 
     public List<Actividad> getActividadesOfCliente(int id_cliente) {
-        Cliente cliente = clienteRepository.findById(id_cliente).orElse(null);
-        return cliente != null ? cliente.getActividades() : null;
+        Cliente cliente = clienteRepository.findById(id_cliente)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+        return cliente.getActividades();
     }
 
     public Cliente removeActividadFromCliente(int id_cliente, int id_actividad) {
-        Cliente cliente = clienteRepository.findById(id_cliente).orElse(null);
-        Actividad actividad = actividadRepository.findById(id_actividad).orElse(null);
-        if (cliente != null && actividad != null) {
-            cliente.getActividades().remove(actividad);
-            clienteRepository.save(cliente);
-        }
-        return cliente;
+        Cliente cliente = clienteRepository.findById(id_cliente)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+        cliente.getActividades().removeIf(actividad -> actividad.getID_actividad() == id_actividad);
+        return clienteRepository.save(cliente);
     }
 }

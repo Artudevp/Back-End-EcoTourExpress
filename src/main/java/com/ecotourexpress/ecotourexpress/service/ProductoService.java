@@ -1,6 +1,8 @@
 package com.ecotourexpress.ecotourexpress.service;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ecotourexpress.ecotourexpress.model.Producto;
@@ -20,6 +22,10 @@ public class ProductoService {
         return (List<Producto>) productoRepository.findAll();
     }
 
+    public Optional<Producto> getProductoById(int id) {
+        return productoRepository.findById(id);
+    }
+    
     public void deleteProducto(int id) {
         productoRepository.deleteById(id);
     }
