@@ -3,6 +3,7 @@ package com.ecotourexpress.ecotourexpress.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,21 +24,21 @@ public class HospedajeController {
     @Autowired
     private HospedajeService hospedajeService;
 
-    @PostMapping("/nuevo")
-    public Hospedaje newHospedaje(@RequestBody Hospedaje hospedaje) {
-        return hospedajeService.saveHospedaje(hospedaje);
-    }
-
-    @GetMapping("/todos")
+    @GetMapping
     public List<Hospedaje> getAllHospedajes() {
         return hospedajeService.getAllHospedajes();
     }
 
-    @PutMapping("/editar/{id}")
+    @PostMapping
+    public Hospedaje newHospedaje(@RequestBody Hospedaje hospedaje) {
+        return hospedajeService.saveHospedaje(hospedaje);
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<Hospedaje> updateHospedaje(@PathVariable int id, @RequestBody Hospedaje hospedajeDetails) {
         Hospedaje hospedaje = hospedajeService.getHospedajeById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + id));
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + id));
+
         hospedaje.setTipo_hab(hospedajeDetails.getTipo_hab());
         hospedaje.setCapacidad(hospedajeDetails.getCapacidad());
         hospedaje.setDisponibilidad(hospedajeDetails.getDisponibilidad());
@@ -47,7 +48,7 @@ public class HospedajeController {
         return ResponseEntity.ok(updatedHospedaje);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void deleteHospedaje(@PathVariable int id) {
         hospedajeService.deleteHospedaje(id);
     }
