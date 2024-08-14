@@ -3,6 +3,8 @@ package com.ecotourexpress.ecotourexpress.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,7 @@ import exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/rutas")
+@CrossOrigin("*")
 public class RutaController {
 
     @Autowired
@@ -48,7 +51,7 @@ public class RutaController {
         return ResponseEntity.ok(updatedRuta);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public void deleteRuta(@PathVariable int id) {
         rutaService.deleteRuta(id);
     }

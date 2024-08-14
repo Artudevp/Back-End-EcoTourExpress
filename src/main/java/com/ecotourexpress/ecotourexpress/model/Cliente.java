@@ -13,6 +13,9 @@ public class Cliente {
     private int ID_cliente;
 
     @Column
+    private Integer cedula;
+
+    @Column
     private String Nombre_cli;
 
     @Column
@@ -45,4 +48,5 @@ public class Cliente {
         joinColumns = @JoinColumn(name = "ID_cliente"),
         inverseJoinColumns = @JoinColumn(name = "ID_producto"))
     private List<Producto> productos;
+
 }

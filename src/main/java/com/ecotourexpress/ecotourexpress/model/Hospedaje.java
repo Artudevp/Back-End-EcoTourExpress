@@ -22,4 +22,8 @@ public class Hospedaje {
 
     @Column
     private int Precio_hab; // Precio en pesos (COP)
+
+    public int getID_hospedaje() {
+        return ID_habitacion;
+    }
 }
