@@ -1,8 +1,10 @@
 package com.ecotourexpress.ecotourexpress.controller;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +14,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.ecotourexpress.ecotourexpress.model.Cliente;
 import com.ecotourexpress.ecotourexpress.model.Actividad;
+import com.ecotourexpress.ecotourexpress.model.Cliente;
+import com.ecotourexpress.ecotourexpress.model.Ruta;
 import com.ecotourexpress.ecotourexpress.service.ClienteService;
 
 import exception.ResourceNotFoundException;
@@ -36,6 +39,12 @@ public class ClienteController {
     public Cliente newCliente(@RequestBody Cliente cliente) {
         return clienteService.saveCliente(cliente);
     }
+    
+    @GetMapping("/{id}")
+    public Cliente getClienteById(@PathVariable int id) {
+        return clienteService.getClienteById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
+    }
 
     // Editar un cliente
     @PutMapping("/{id}")
@@ -55,14 +64,6 @@ public class ClienteController {
         return ResponseEntity.ok(updatedCliente);
     }
 
-    // Obtener un cliente por ID
-    @GetMapping("/{id}")
-    public Cliente getClienteById(@PathVariable int id) {
-        return clienteService.getClienteById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
-    }
-
-    // Eliminar un cliente
     @DeleteMapping("/{id}")
     public void deleteCliente(@PathVariable int id) {
         clienteService.deleteCliente(id);
@@ -89,4 +90,40 @@ public class ClienteController {
             @PathVariable int id_actividad) {
         return clienteService.removeActividadFromCliente(id_cliente, id_actividad);
     }
+
+    @PutMapping("/{id_cliente}/rutas")
+    public Cliente addRutasToCliente(
+            @PathVariable int id_cliente,
+            @RequestBody List<Ruta> rutas) {
+        return clienteService.addRutasToCliente(id_cliente, rutas);
+    }
+
+    @GetMapping("/{id_cliente}/rutas")
+    public List<Ruta> getRutasOfCliente(@PathVariable int id_cliente) {
+        return clienteService.getRutasOfCliente(id_cliente);
+    }
+
+    @DeleteMapping("/{id_cliente}/rutas/{id_ruta}")
+    public Cliente removeRutaFromCliente(
+            @PathVariable int id_cliente,
+            @PathVariable int id_ruta) {
+        return clienteService.removeRutaFromCliente(id_cliente, id_ruta);
+    }
+
+    // @PutMapping("/{id_cliente}/hospedaje")
+    // public Cliente addHospedajeToCliente(
+    //         @PathVariable int id_cliente,
+    //         @RequestBody Hospedaje hospedaje) {
+    //     return clienteService.addHospedajeToCliente(id_cliente, hospedaje);
+    // }
+
+    // @GetMapping("/{id_cliente}/hospedaje")
+    // public Hospedaje getHospedajeOfCliente(@PathVariable int id_cliente) {
+    //     return clienteService.getHospedajeOfCliente(id_cliente);
+    // }
+
+    // @DeleteMapping("/{id_cliente}/hospedaje")
+    // public Cliente removeHospedajeFromCliente(@PathVariable int id_cliente) {
+    //     return clienteService.removeHospedajeFromCliente(id_cliente);
+    // }
 }
