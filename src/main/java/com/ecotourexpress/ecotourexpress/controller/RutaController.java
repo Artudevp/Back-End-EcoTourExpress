@@ -3,7 +3,6 @@ package com.ecotourexpress.ecotourexpress.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,23 +19,22 @@ import exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/rutas")
-@CrossOrigin("*")
 public class RutaController {
 
     @Autowired
     private RutaService rutaService;
-
-    @PostMapping("/nueva")
-    public Ruta newRuta(@RequestBody Ruta ruta) {
-        return rutaService.saveRuta(ruta);
-    }
-
-    @GetMapping("/todas")
+    
+    @GetMapping
     public List<Ruta> getAllRutas() {
         return rutaService.getAllRutas();
     }
 
-    @PutMapping("/editar/{id}")
+    @PostMapping
+    public Ruta newRuta(@RequestBody Ruta ruta) {
+        return rutaService.saveRuta(ruta);
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<Ruta> updateRuta(@PathVariable int id, @RequestBody Ruta rutaDetails) {
         Ruta ruta = rutaService.getRutaById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrado con id: " + id));
@@ -51,7 +49,7 @@ public class RutaController {
         return ResponseEntity.ok(updatedRuta);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void deleteRuta(@PathVariable int id) {
         rutaService.deleteRuta(id);
     }

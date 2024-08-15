@@ -3,7 +3,7 @@ package com.ecotourexpress.ecotourexpress.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,23 +18,22 @@ import exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin("*")
 public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
-
-    @PostMapping("/nuevo")
-    public Usuario newUsuario(@RequestBody Usuario usuario) {
-        return usuarioService.saveUsuario(usuario);
-    }
-
-    @GetMapping("/todos")
+    
+    @GetMapping
     public List<Usuario> getAllUsuarios() {
         return usuarioService.getAllUsuarios();
     }
 
-    @PutMapping("/editar/{id}")
+    @PostMapping
+    public Usuario newUsuario(@RequestBody Usuario usuario) {
+        return usuarioService.saveUsuario(usuario);
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable int id, @RequestBody Usuario usuarioDetails) {
         Usuario usuario = usuarioService.getUsuarioById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
@@ -47,7 +46,7 @@ public class UsuarioController {
         return ResponseEntity.ok(updatedUsuario);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public void deleteUsuario(@PathVariable int id) {
         usuarioService.deleteUsuario(id);
     }

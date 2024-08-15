@@ -4,15 +4,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
+
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.model.Cliente;
@@ -23,33 +23,35 @@ import exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/clientes")
-@CrossOrigin("*")
 public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
 
-    @PostMapping("/nuevo")
-    public Cliente newCliente(@RequestBody Cliente cliente) {
-        return clienteService.saveCliente(cliente);
-    }
-
-    @GetMapping("/todos")
+    // Obtener todos los clientes
+    @GetMapping
     public List<Cliente> getAllClientes() {
         return clienteService.getAllClientes();
     }
 
+    // Crear un nuevo cliente
+    @PostMapping
+    public Cliente newCliente(@RequestBody Cliente cliente) {
+        return clienteService.saveCliente(cliente);
+    }
+    
     @GetMapping("/{id}")
     public Cliente getClienteById(@PathVariable int id) {
         return clienteService.getClienteById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
     }
 
-    @PutMapping("/editar/{id}")
+    // Editar un cliente
+    @PutMapping("/{id}")
     public ResponseEntity<Cliente> updateCliente(@PathVariable int id, @RequestBody Cliente clienteDetails) {
         Cliente cliente = clienteService.getClienteById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
-        
+
         cliente.setNombre_cli(clienteDetails.getNombre_cli());
         cliente.setEdad(clienteDetails.getEdad());
         cliente.setGenero(clienteDetails.getGenero());
@@ -67,6 +69,13 @@ public class ClienteController {
         clienteService.deleteCliente(id);
     }
 
+    // Obtener todas las actividades de un cliente
+    @GetMapping("/{id_cliente}/actividades")
+    public List<Actividad> getActividadesOfCliente(@PathVariable int id_cliente) {
+        return clienteService.getActividadesOfCliente(id_cliente);
+    }
+
+    // Asociar actividades a un cliente
     @PutMapping("/{id_cliente}/actividades")
     public Cliente addActividadesToCliente(
             @PathVariable int id_cliente,
@@ -74,11 +83,7 @@ public class ClienteController {
         return clienteService.addActividadesToCliente(id_cliente, actividades);
     }
 
-    @GetMapping("/{id_cliente}/actividades")
-    public List<Actividad> getActividadesOfCliente(@PathVariable int id_cliente) {
-        return clienteService.getActividadesOfCliente(id_cliente);
-    }
-
+    // Eliminar una actividad de un cliente
     @DeleteMapping("/{id_cliente}/actividades/{id_actividad}")
     public Cliente removeActividadFromCliente(
             @PathVariable int id_cliente,

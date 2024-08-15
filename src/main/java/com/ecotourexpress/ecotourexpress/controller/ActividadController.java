@@ -3,7 +3,6 @@ package com.ecotourexpress.ecotourexpress.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,24 +19,23 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/actividades")
 public class ActividadController {
 
     @Autowired
     private ActividadService actividadService;
 
-    @PostMapping("/nueva")
-    public Actividad newActividad(@RequestBody Actividad actividad) {
-        return actividadService.saveActividad(actividad);
-    }
-
-    @GetMapping("/todas")
+    @GetMapping
     public List<Actividad> getAllActividades() {
         return actividadService.getAllActividades();
     }
 
-    @PutMapping("/editar/{id}")
+    @PostMapping
+    public Actividad newActividad(@RequestBody Actividad actividad) {
+        return actividadService.saveActividad(actividad);
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<Actividad> updateActividad(@PathVariable int id, @RequestBody Actividad actividadDetails) {
         Actividad actividad = actividadService.getActividadById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
@@ -52,10 +50,10 @@ public class ActividadController {
         return ResponseEntity.ok(updatedActividad);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteActividad(@PathVariable int id) {
         actividadService.deleteActividad(id);
         return ResponseEntity.noContent().build();
     }
 
-    }
+}
