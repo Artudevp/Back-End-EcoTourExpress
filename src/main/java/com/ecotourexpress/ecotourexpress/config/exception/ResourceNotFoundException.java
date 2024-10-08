@@ -1,4 +1,4 @@
-package exception;
+package com.ecotourexpress.ecotourexpress.config.exception;
 
 
 import org.springframework.http.HttpStatus;

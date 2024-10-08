@@ -12,45 +12,77 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
+import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.model.Ruta;
 import com.ecotourexpress.ecotourexpress.service.RutaService;
 
-import exception.ResourceNotFoundException;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/rutas")
 public class RutaController {
 
+    // Conexión a Service
     @Autowired
     private RutaService rutaService;
     
+    // Obtener lista de rutas
     @GetMapping
     public List<Ruta> getAllRutas() {
         return rutaService.getAllRutas();
     }
 
+    // Agregar o actualizar ruta
     @PostMapping
-    public Ruta newRuta(@RequestBody Ruta ruta) {
+    public Ruta newRuta(@Valid @RequestBody Ruta ruta) {
         return rutaService.saveRuta(ruta);
     }
 
+    // Seleccionar ruta por ID (Editar)
     @PutMapping("/{id}")
-    public ResponseEntity<Ruta> updateRuta(@PathVariable int id, @RequestBody Ruta rutaDetails) {
+    public ResponseEntity<Ruta> updateRuta(@PathVariable int id, @Valid @RequestBody Ruta rutaDetails) {
         Ruta ruta = rutaService.getRutaById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrado con id: " + id));
         
         ruta.setNombre_ruta(rutaDetails.getNombre_ruta());
         ruta.setDuración_ruta(rutaDetails.getDuración_ruta());
         ruta.setPrecio(rutaDetails.getPrecio());
-        ruta.setActividades(rutaDetails.getActividades());
-        ruta.setClientes(rutaDetails.getClientes());
+        ruta.setCapacidad(rutaDetails.getCapacidad());
 
         final Ruta updatedRuta = rutaService.saveRuta(ruta);
         return ResponseEntity.ok(updatedRuta);
     }
 
+    // Elimar ruta
     @DeleteMapping("/{id}")
     public void deleteRuta(@PathVariable int id) {
         rutaService.deleteRuta(id);
+    }
+
+
+    // Agregar actividades a una ruta
+    @PutMapping("/{id_ruta}/actividades")
+    public ResponseEntity<Ruta> addActividadesToRuta(
+            @PathVariable int id_ruta,
+            @RequestBody List<Actividad> actividades) {
+        Ruta updatedRuta = rutaService.addActividadesToRuta(id_ruta, actividades);
+        return ResponseEntity.ok(updatedRuta);
+    }
+
+
+    // Obtener todas las actividades de una ruta
+    @GetMapping("/{id_ruta}/actividades")
+    public List<Actividad> getActividadesOfRuta(@PathVariable int id_ruta) {
+        return rutaService.getActividadesOfRuta(id_ruta);
+    }
+
+    // Eliminar actividad de una ruta
+    @DeleteMapping("/{id_ruta}/actividades/{id_actividad}")
+    public ResponseEntity<Ruta> removeActividadFromRuta(
+            @PathVariable int id_ruta,
+            @PathVariable int id_actividad) {
+        Ruta updatedRuta = rutaService.removeActividadFromRuta(id_ruta, id_actividad);
+        return ResponseEntity.ok(updatedRuta);
     }
 }

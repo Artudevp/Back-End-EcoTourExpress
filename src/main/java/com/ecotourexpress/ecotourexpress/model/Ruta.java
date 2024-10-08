@@ -1,7 +1,12 @@
 package com.ecotourexpress.ecotourexpress.model;
 
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Entity
@@ -13,20 +18,23 @@ public class Ruta {
     private int ID_ruta;
 
     @Column
+    @NotBlank(message = "El nombre de la ruta no puede estar vacio.")
     private String Nombre_ruta;
 
     @Column
+    @Min(value = 1, message = "la duracion debe ser al menos 1 hora")
     private int Duración_ruta; // Duración en horas
 
     @Column
+    @Min(value = 0, message = "El precio no puede ser negativo.")
     private int Precio; // Precio en pesos (COP)
 
-    @ManyToMany
-    @JoinTable(
-        name = "ruta_cliente",
-        joinColumns = @JoinColumn(name = "ID_ruta"),
-        inverseJoinColumns = @JoinColumn(name = "ID_cliente")
-    )
+    @Column
+    @Min(value = 1, message = "La capacidad debe ser de al menos")
+    private int Capacidad;
+
+    @ManyToMany(mappedBy = "rutas")
+    @JsonIgnore
     private List<Cliente> clientes;
 
     @ManyToMany

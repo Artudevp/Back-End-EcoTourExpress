@@ -12,30 +12,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
 import com.ecotourexpress.ecotourexpress.model.Producto;
 import com.ecotourexpress.ecotourexpress.service.ProductoService;
 
-import exception.ResourceNotFoundException;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/productos")
 public class ProductoController {
 
+    // Conexión a service
     @Autowired
     private ProductoService productoService;
 
+    // Obtener lista de productos
     @GetMapping
     public List<Producto> getAllProductos() {
         return productoService.getAllProductos();
     }
 
+    // Agregar o Actualizar producto
     @PostMapping
-    public Producto newProducto(@RequestBody Producto producto) {
+    public Producto newProducto(@Valid @RequestBody Producto producto) {
         return productoService.saveProducto(producto);
     }
 
+    // Seleccionar producto por ID (editar)
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProducto(@PathVariable int id, @RequestBody Producto productoDetails) {
+    public ResponseEntity<Producto> updateProducto(@PathVariable int id, @Valid @RequestBody Producto productoDetails) {
         Producto producto = productoService.getProductoById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
 
@@ -48,6 +53,7 @@ public class ProductoController {
         return ResponseEntity.ok(updatedProducto);
     }
 
+    // Eliminar producto
     @DeleteMapping("/{id}")
     public void deleteProducto(@PathVariable int id) {
         productoService.deleteProducto(id);

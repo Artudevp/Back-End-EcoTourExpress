@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
 import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.service.ActividadService;
 
-import exception.ResourceNotFoundException;
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -22,34 +24,38 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping("/actividades")
 public class ActividadController {
 
+    // Conexión a service
     @Autowired
     private ActividadService actividadService;
 
+    // Obtener lista de actividades
     @GetMapping
     public List<Actividad> getAllActividades() {
         return actividadService.getAllActividades();
     }
 
+    // Agregar o actualizar Actividad
     @PostMapping
-    public Actividad newActividad(@RequestBody Actividad actividad) {
+    public Actividad newActividad(@Valid @RequestBody Actividad actividad) {
         return actividadService.saveActividad(actividad);
     }
 
+    // Seleccionar Actividad por ID (Editar)
     @PutMapping("/{id}")
-    public ResponseEntity<Actividad> updateActividad(@PathVariable int id, @RequestBody Actividad actividadDetails) {
+    public ResponseEntity<Actividad> updateActividad(@PathVariable int id, @Valid @RequestBody Actividad actividadDetails) {
         Actividad actividad = actividadService.getActividadById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
 
         actividad.setNombre_act(actividadDetails.getNombre_act());
-        actividad.setDuración_act(actividadDetails.getDuración_act());
+        actividad.setDuracion_act(actividadDetails.getDuracion_act());
         actividad.setPrecio_act(actividadDetails.getPrecio_act());
-        actividad.setClientes(actividadDetails.getClientes());
-        actividad.setRutas(actividadDetails.getRutas());
+        actividad.setCapacidad(actividadDetails.getCapacidad());
 
         final Actividad updatedActividad = actividadService.saveActividad(actividad);
         return ResponseEntity.ok(updatedActividad);
     }
 
+    // Eliminar Actividad
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteActividad(@PathVariable int id) {
         actividadService.deleteActividad(id);
