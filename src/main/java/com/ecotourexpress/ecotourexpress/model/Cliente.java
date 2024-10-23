@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -45,25 +47,29 @@ public class Cliente {
     @JoinColumn(name = "ID_habitacion")
     private Hospedaje habitacion;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "cliente_actividad", 
         joinColumns = @JoinColumn(name = "ID_cliente"),
         inverseJoinColumns = @JoinColumn(name = "ID_actividad"))
     private List<Actividad> actividades;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "cliente_ruta",
         joinColumns = @JoinColumn(name = "ID_cliente"),
         inverseJoinColumns = @JoinColumn(name = "ID_ruta"))
     private List<Ruta> rutas;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "cliente_producto",
         joinColumns = @JoinColumn(name = "ID_cliente"),
         inverseJoinColumns = @JoinColumn(name = "ID_producto"))
     private List<Producto> productos;
     
+    @OneToOne
+    @JsonBackReference
+    @JoinColumn(name = "ID_usuario", unique = true)
+    private User usuario;
 }

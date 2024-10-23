@@ -3,6 +3,7 @@ package com.ecotourexpress.ecotourexpress.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,12 +16,14 @@ import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundExcept
 import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.service.ActividadService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
+@Transactional
 @RequestMapping("/actividades")
 public class ActividadController {
 
@@ -30,18 +33,21 @@ public class ActividadController {
 
     // Obtener lista de actividades
     @GetMapping
+    @PreAuthorize("permitAll()")
     public List<Actividad> getAllActividades() {
         return actividadService.getAllActividades();
     }
 
     // Agregar o actualizar Actividad
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Actividad newActividad(@Valid @RequestBody Actividad actividad) {
         return actividadService.saveActividad(actividad);
     }
 
     // Seleccionar Actividad por ID (Editar)
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Actividad> updateActividad(@PathVariable int id, @Valid @RequestBody Actividad actividadDetails) {
         Actividad actividad = actividadService.getActividadById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
@@ -57,6 +63,7 @@ public class ActividadController {
 
     // Eliminar Actividad
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteActividad(@PathVariable int id) {
         actividadService.deleteActividad(id);
         return ResponseEntity.noContent().build();

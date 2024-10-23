@@ -3,6 +3,7 @@ package com.ecotourexpress.ecotourexpress.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +18,11 @@ import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.model.Ruta;
 import com.ecotourexpress.ecotourexpress.service.RutaService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
+@Transactional
 @RequestMapping("/rutas")
 public class RutaController {
 
@@ -29,18 +32,21 @@ public class RutaController {
     
     // Obtener lista de rutas
     @GetMapping
+    @PreAuthorize("permitAll()")
     public List<Ruta> getAllRutas() {
         return rutaService.getAllRutas();
     }
 
     // Agregar o actualizar ruta
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Ruta newRuta(@Valid @RequestBody Ruta ruta) {
         return rutaService.saveRuta(ruta);
     }
 
     // Seleccionar ruta por ID (Editar)
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Ruta> updateRuta(@PathVariable int id, @Valid @RequestBody Ruta rutaDetails) {
         Ruta ruta = rutaService.getRutaById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrado con id: " + id));
@@ -56,6 +62,7 @@ public class RutaController {
 
     // Elimar ruta
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteRuta(@PathVariable int id) {
         rutaService.deleteRuta(id);
     }
@@ -63,6 +70,7 @@ public class RutaController {
 
     // Agregar actividades a una ruta
     @PutMapping("/{id_ruta}/actividades")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Ruta> addActividadesToRuta(
             @PathVariable int id_ruta,
             @RequestBody List<Actividad> actividades) {
@@ -73,12 +81,14 @@ public class RutaController {
 
     // Obtener todas las actividades de una ruta
     @GetMapping("/{id_ruta}/actividades")
+    @PreAuthorize("permitAll()")
     public List<Actividad> getActividadesOfRuta(@PathVariable int id_ruta) {
         return rutaService.getActividadesOfRuta(id_ruta);
     }
 
     // Eliminar actividad de una ruta
     @DeleteMapping("/{id_ruta}/actividades/{id_actividad}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Ruta> removeActividadFromRuta(
             @PathVariable int id_ruta,
             @PathVariable int id_actividad) {

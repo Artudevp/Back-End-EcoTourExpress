@@ -11,7 +11,7 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,6 +19,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
@@ -50,7 +51,7 @@ public class User implements UserDetails{
     @NotBlank(message = "El correo no puede estar vacío")
     private String correo;
     
-    @Column
+    @Column(unique = true, nullable = false)
     private String username;
 
 
@@ -87,6 +88,10 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return true;
     }
+
+    @OneToOne(mappedBy = "usuario")
+    @JsonManagedReference
+    private Cliente cliente;
 
     
 }

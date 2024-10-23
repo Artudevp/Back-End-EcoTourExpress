@@ -61,29 +61,27 @@ public class ClienteService {
     }
 
     // Añadir actividades al cliente con verificación de capacidad
-    public Cliente addActividadesToCliente(int id_cliente, List<Actividad> actividades) {
+    public Cliente addActividadesToCliente(int id_cliente, List<Integer> actividadIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-
-        for (Actividad actividad : actividades) {
-            Actividad act = actividadRepository.findById(actividad.getID_actividad())
-                    .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + actividad.getID_actividad()));
-
-            // Verificar la capacidad de la actividad
-            if (act.getCapacidad() > 0) {
-                // Decrementar la capacidad de la actividad
-                act.setCapacidad(act.getCapacidad() - 1);
-                actividadRepository.save(act); // Guardar cambios en la actividad
-
-                // Agregar la actividad al cliente
-                cliente.getActividades().add(act);
-            } else {
-                throw new RuntimeException("No hay suficiente capacidad en la actividad con id: " + actividad.getID_actividad());
+    
+        for (Integer actividadId : actividadIds) {
+            Actividad existingActividad = actividadRepository.findById(actividadId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + actividadId));
+    
+            // Verificar que la actividad no esté ya asociada al cliente
+            if (!cliente.getActividades().contains(existingActividad)) {
+                cliente.getActividades().add(existingActividad);
+                // Ajusta la capacidad si es necesario
+                existingActividad.setCapacidad(existingActividad.getCapacidad() - 1);
+                actividadRepository.save(existingActividad); // Guardar cambios en la actividad
             }
         }
-
+    
+        // Guardar cambios en el cliente
         return clienteRepository.save(cliente);
     }
+    
 
 
     // Obtener actividades del cliente
@@ -118,13 +116,13 @@ public class ClienteService {
 
 
     // Añadir rutas al cliente
-    public Cliente addRutasToCliente(int id_cliente, List<Ruta> rutas) {
+    public Cliente addRutasToCliente(int id_cliente, List<Integer> rutaIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
         
-        for (Ruta ruta : rutas) {
-            Ruta rut = rutaRepository.findById(ruta.getID_ruta())
-                    .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrada con id: " + ruta.getID_ruta()));
+        for (Integer id_ruta : rutaIds) {
+            Ruta rut = rutaRepository.findById(id_ruta)
+                    .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrada con id: " + id_ruta));
             
             // Verificar la capacidad de las actividades
             boolean capacidadSuficiente = true;
@@ -145,13 +143,13 @@ public class ClienteService {
                     actividad.setCapacidad(actividad.getCapacidad() - 1);
                     actividadRepository.save(actividad); // Guardar cambios en la actividad
                 }
-    
+
                 cliente.getRutas().add(rut); // Agregar la ruta al cliente
             } else {
                 throw new RuntimeException("No hay suficiente capacidad en las actividades de la ruta.");
             }
         }
-    
+
         return clienteRepository.save(cliente);
     }
     
@@ -201,23 +199,25 @@ public class ClienteService {
     }
 
     // Asignar hospedaje a Cliente
-    public Cliente addHospedajeToCliente(int id_cliente, Hospedaje hospedaje) {
+    public Cliente addHospedajeToCliente(int id_cliente, int id_hospedaje) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
     
-        Hospedaje hos = hospedajeRepository.findById(hospedaje.getID_habitacion())
-                .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + hospedaje.getID_habitacion()));
+        // Buscar el hospedaje usando el ID
+        Hospedaje hos = hospedajeRepository.findById(id_hospedaje)
+                .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + id_hospedaje));
     
+        // Verificar disponibilidad
         if (hos.getDisponibilidad() > 0) {
             cliente.setHabitacion(hos);
             hos.setDisponibilidad(hos.getDisponibilidad() - 1);
             hospedajeRepository.save(hos);
         } else {
-            throw new IllegalStateException("No hay habitaciones disponibles para el hospedaje con id: " + hospedaje.getID_habitacion());
+            throw new IllegalStateException("No hay habitaciones disponibles para el hospedaje con id: " + id_hospedaje);
         }
     
         return clienteRepository.save(cliente);
-    }
+    }    
     
     // Eliminar hospedaje de cliente
     public Cliente removeHospedajeFromCliente(int id_cliente) {
@@ -238,11 +238,11 @@ public class ClienteService {
     public Cliente addProductosToCliente(int id_cliente, List<Integer> id_productos) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-    
+
         for (int productoId : id_productos) {
             Producto producto = productoRepository.findById(productoId)
                     .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productoId));
-    
+
             if (producto.getCantidad_disponible() > 0) {
                 // Agregar el producto a la lista de productos del cliente
                 cliente.getProductos().add(producto);
@@ -254,7 +254,7 @@ public class ClienteService {
                 throw new IllegalStateException("No hay existencias disponibles para el producto con id: " + productoId);
             }
         }
-    
+
         return clienteRepository.save(cliente);
     }
     

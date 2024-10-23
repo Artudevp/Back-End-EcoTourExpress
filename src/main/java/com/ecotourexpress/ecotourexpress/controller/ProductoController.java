@@ -3,6 +3,7 @@ package com.ecotourexpress.ecotourexpress.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +17,11 @@ import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundExcept
 import com.ecotourexpress.ecotourexpress.model.Producto;
 import com.ecotourexpress.ecotourexpress.service.ProductoService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
+@Transactional
 @RequestMapping("/productos")
 public class ProductoController {
 
@@ -28,18 +31,21 @@ public class ProductoController {
 
     // Obtener lista de productos
     @GetMapping
+    @PreAuthorize("permitAll()")
     public List<Producto> getAllProductos() {
         return productoService.getAllProductos();
     }
 
     // Agregar o Actualizar producto
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Producto newProducto(@Valid @RequestBody Producto producto) {
         return productoService.saveProducto(producto);
     }
 
     // Seleccionar producto por ID (editar)
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Producto> updateProducto(@PathVariable int id, @Valid @RequestBody Producto productoDetails) {
         Producto producto = productoService.getProductoById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
@@ -55,6 +61,7 @@ public class ProductoController {
 
     // Eliminar producto
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteProducto(@PathVariable int id) {
         productoService.deleteProducto(id);
     }

@@ -37,7 +37,7 @@ public class Ruta {
     @JsonIgnore
     private List<Cliente> clientes;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "ruta_actividad",
         joinColumns = @JoinColumn(name = "ID_ruta"),
