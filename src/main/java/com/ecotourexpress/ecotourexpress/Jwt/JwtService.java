@@ -1,11 +1,14 @@
 package com.ecotourexpress.ecotourexpress.Jwt;
 
 import java.security.Key;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -25,15 +28,22 @@ public class JwtService {
     }
 
     private String getToken(Map<String,Object> extraClaims, UserDetails user) {
-        return Jwts
-            .builder()
-            .setClaims(extraClaims)
-            .setSubject(user.getUsername())
-            .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
-            .signWith(getKey(), SignatureAlgorithm.HS256)
-            .compact();
-    }
+    // Obtener los roles del usuario y agregarlos a extraClaims
+    Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+    String role = authorities.stream()
+                             .map(GrantedAuthority::getAuthority)
+                             .collect(Collectors.joining(","));
+    extraClaims.put("role", role);
+
+    return Jwts
+        .builder()
+        .setClaims(extraClaims)
+        .setSubject(user.getUsername())
+        .setIssuedAt(new Date(System.currentTimeMillis()))
+        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+        .signWith(getKey(), SignatureAlgorithm.HS256)
+        .compact();
+}
 
     private Key getKey() {
        byte[] keyBytes=Decoders.BASE64.decode(SECRET_KEY);
