@@ -6,6 +6,7 @@ import com.ecotourexpress.ecotourexpress.model.Producto;
 import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
 import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.model.Ruta;
+import com.ecotourexpress.ecotourexpress.model.DTO.ClienteDTO;
 import com.ecotourexpress.ecotourexpress.repository.ClienteRepository;
 import com.ecotourexpress.ecotourexpress.repository.HospedajeRepository;
 import com.ecotourexpress.ecotourexpress.repository.ProductoRepository;
@@ -15,9 +16,8 @@ import com.ecotourexpress.ecotourexpress.repository.RutaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ClienteService {
@@ -38,22 +38,65 @@ public class ClienteService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    // Método para convertir Cliente a ClienteDTO
+    public ClienteDTO convertToDTO(Cliente cliente) {
+        return new ClienteDTO(
+            cliente.getID_cliente(),
+            cliente.getCedula(),
+            cliente.getNombre_cli(),
+            cliente.getEdad(),
+            cliente.getGenero()
+        );
+    }
+    
+
+    // Método para convertir ClienteDTO a Cliente
+    public Cliente convertToEntity(ClienteDTO clienteDTO) {
+        Cliente cliente = new Cliente();
+        cliente.setID_cliente(clienteDTO.getID_cliente());
+        cliente.setCedula(clienteDTO.getCedula());
+        cliente.setNombre_cli(clienteDTO.getNombre_cli());
+        cliente.setEdad(clienteDTO.getEdad());
+        cliente.setGenero(clienteDTO.getGenero());
+        return cliente;
+    }
+
     // Guardar o actualizar cliente
-    public Cliente saveCliente(Cliente cliente) {
-        return clienteRepository.save(cliente);
+    public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
+        Cliente cliente = convertToEntity(clienteDTO);
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
     }
 
     // Obtener todos los clientes
-    public List<Cliente> getAllClientes() {
-        List<Cliente> clientes = new ArrayList<>();
-        clienteRepository.findAll().forEach(clientes::add);
-        return clientes;
+    public List<ClienteDTO> getAllClientes() {
+        List<Cliente> clientes = clienteRepository.findAll();
+        return clientes.stream()
+                       .map(this::convertToDTO)
+                       .collect(Collectors.toList());
     }
 
-    // Obtener cliente por ID (editar)
-    public Optional<Cliente> getClienteById(int id) {
-        return clienteRepository.findById(id);
+    // Obtener cliente por ID
+    public ClienteDTO getClienteById(int id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
+        return convertToDTO(cliente);
     }
+
+    // Editar Cliente
+    public ClienteDTO updateCliente(int id, ClienteDTO clienteDTO) {
+        Cliente clienteExistente = clienteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
+
+        clienteExistente.setNombre_cli(clienteDTO.getNombre_cli());
+        clienteExistente.setEdad(clienteDTO.getEdad());
+        clienteExistente.setGenero(clienteDTO.getGenero());
+        clienteExistente.setCedula(clienteDTO.getCedula());
+    
+        Cliente clienteActualizado = clienteRepository.save(clienteExistente);
+        return convertToDTO(clienteActualizado);
+    }
+    
 
     // Eliminar cliente
     public void deleteCliente(int id) {
@@ -61,7 +104,7 @@ public class ClienteService {
     }
 
     // Añadir actividades al cliente con verificación de capacidad
-    public Cliente addActividadesToCliente(int id_cliente, List<Integer> actividadIds) {
+    public ClienteDTO addActividadesToCliente(int id_cliente, List<Integer> actividadIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
     
@@ -79,11 +122,10 @@ public class ClienteService {
         }
     
         // Guardar cambios en el cliente
-        return clienteRepository.save(cliente);
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
     }
     
-
-
     // Obtener actividades del cliente
     public List<Actividad> getActividadesOfCliente(int id_cliente) {
         Cliente cliente = clienteRepository.findById(id_cliente)
@@ -92,7 +134,7 @@ public class ClienteService {
     }
 
     // Eliminar actividad del cliente y ajustar la capacidad
-    public Cliente removeActividadFromCliente(int id_cliente, int id_actividad) {
+    public ClienteDTO removeActividadFromCliente(int id_cliente, int id_actividad) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
         
@@ -111,12 +153,12 @@ public class ClienteService {
             throw new RuntimeException("La actividad no está asignada a este cliente.");
         }
 
-        return clienteRepository.save(cliente);
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
     }
 
-
     // Añadir rutas al cliente
-    public Cliente addRutasToCliente(int id_cliente, List<Integer> rutaIds) {
+    public ClienteDTO addRutasToCliente(int id_cliente, List<Integer> rutaIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
         
@@ -150,10 +192,10 @@ public class ClienteService {
             }
         }
 
-        return clienteRepository.save(cliente);
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
     }
     
-
     // Obtener rutas del cliente
     public List<Ruta> getRutasOfCliente(int id_cliente) {
         Cliente cliente = clienteRepository.findById(id_cliente)
@@ -162,7 +204,7 @@ public class ClienteService {
     }
 
     // Eliminar ruta del cliente y ajustar la capacidad
-    public Cliente removeRutaFromCliente(int id_cliente, int id_ruta) {
+    public ClienteDTO removeRutaFromCliente(int id_cliente, int id_ruta) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
         
@@ -187,19 +229,19 @@ public class ClienteService {
             throw new RuntimeException("La ruta no está asignada a este cliente.");
         }
 
-        return clienteRepository.save(cliente);
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
     }
 
     // Consultar hospedaje de cliente
     public Hospedaje getHospedajeOfCliente(int id_cliente) {
-    Cliente cliente = clienteRepository.findById(id_cliente)
-            .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-
-    return cliente.getHabitacion();
+        Cliente cliente = clienteRepository.findById(id_cliente)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+        return cliente.getHabitacion();
     }
 
     // Asignar hospedaje a Cliente
-    public Cliente addHospedajeToCliente(int id_cliente, int id_hospedaje) {
+    public ClienteDTO addHospedajeToCliente(int id_cliente, int id_hospedaje) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
     
@@ -216,80 +258,79 @@ public class ClienteService {
             throw new IllegalStateException("No hay habitaciones disponibles para el hospedaje con id: " + id_hospedaje);
         }
     
-        return clienteRepository.save(cliente);
-    }    
-    
-    // Eliminar hospedaje de cliente
-    public Cliente removeHospedajeFromCliente(int id_cliente) {
-        Cliente cliente = clienteRepository.findById(id_cliente)
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-    
-        Hospedaje hos = cliente.getHabitacion();
-        if (hos != null) {
-            hos.setDisponibilidad(hos.getDisponibilidad() + 1);
-            hospedajeRepository.save(hos);
-            cliente.setHabitacion(null);
-        }
-    
-        return clienteRepository.save(cliente);
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
     }
     
-    // Agregar productos al cliente y ajustar existencias
-    public Cliente addProductosToCliente(int id_cliente, List<Integer> id_productos) {
+    // Desasignar hospedaje de cliente
+    public ClienteDTO removeHospedajeFromCliente(int id_cliente) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+    
+        Hospedaje hospedaje = cliente.getHabitacion();
+        if (hospedaje != null) {
+            hospedaje.setDisponibilidad(hospedaje.getDisponibilidad() + 1); // Incrementar la disponibilidad
+            hospedajeRepository.save(hospedaje); // Guardar cambios en el hospedaje
+            cliente.setHabitacion(null); // Desasignar el hospedaje del cliente
+        } else {
+            throw new RuntimeException("Este cliente no tiene hospedaje asignado.");
+        }
 
-        for (int productoId : id_productos) {
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
+    }
+
+    // Consultar productos de cliente
+    public List<Producto> getProductosOfCliente(int id_cliente) {
+        Cliente cliente = clienteRepository.findById(id_cliente)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+        return cliente.getProductos();
+    }
+
+    // Añadir productos al cliente
+    public ClienteDTO addProductosToCliente(int id_cliente, List<Integer> productoIds) {
+        Cliente cliente = clienteRepository.findById(id_cliente)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+        
+        for (Integer productoId : productoIds) {
             Producto producto = productoRepository.findById(productoId)
                     .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productoId));
-
+    
+            // Verificar que el producto esté disponible
             if (producto.getCantidad_disponible() > 0) {
-                // Agregar el producto a la lista de productos del cliente
                 cliente.getProductos().add(producto);
-                
-                // Decrementar la cantidad disponible del producto
-                producto.setCantidad_disponible(producto.getCantidad_disponible() - 1);
+                producto.setCantidad_disponible(producto.getCantidad_disponible() - 1); // Decrementar la cantidad disponible
                 productoRepository.save(producto); // Guardar cambios en el producto
             } else {
-                throw new IllegalStateException("No hay existencias disponibles para el producto con id: " + productoId);
+                throw new RuntimeException("Producto no disponible: " + producto.getNombre_p());
             }
         }
 
-        return clienteRepository.save(cliente);
-    }
-    
-
-    // Consultar productos asignados a cliente
-    public List<Producto> getProductoOfCliente(int id_cliente) {
-        Cliente cliente = clienteRepository.findById(id_cliente)
-        .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-
-    return cliente.getProductos();
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
     }
 
-    // Eliminar productos del cliente y ajustar existencias
-    public Cliente removeProductosFromCliente(int id_cliente, List<Integer> id_productos) {
+    public ClienteDTO removeProductoFromCliente(int id_cliente, List<Integer> id_productos) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-
-        for (int id_producto : id_productos) {
+    
+        // Iterar sobre la lista de IDs de productos
+        for (Integer id_producto : id_productos) {
             Producto producto = productoRepository.findById(id_producto)
                     .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id_producto));
-
-            // Verificar si el producto pertenece al cliente antes de eliminarlo
+    
+            // Verificar que el producto esté asignado al cliente antes de eliminarlo
             if (cliente.getProductos().contains(producto)) {
-                // Incrementar la cantidad disponible del producto
-                producto.setCantidad_disponible(producto.getCantidad_disponible() + 1);
-                productoRepository.save(producto); // Guardar cambios en el producto
-
-                // Eliminar el producto de la lista de productos del cliente
                 cliente.getProductos().remove(producto);
+                producto.setCantidad_disponible(producto.getCantidad_disponible() + 1); // Incrementar la cantidad disponible
+                productoRepository.save(producto); // Guardar cambios en el producto
             } else {
-                throw new RuntimeException("El producto con id: " + id_producto + " no está asignado a este cliente.");
+                throw new RuntimeException("El producto con ID " + id_producto + " no está asignado a este cliente.");
             }
         }
-
-        return clienteRepository.save(cliente);
+    
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
     }
-
+    
 }

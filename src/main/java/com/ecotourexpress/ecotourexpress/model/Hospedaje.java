@@ -33,6 +33,9 @@ public class Hospedaje {
     @Min(value = 30000, message = "El precio minimo es de 30000")
     private int Precio_hab; // Precio en pesos (COP)
 
+    @Column
+    private String Descripcion_hab;
+
     public int getID_hospedaje() {
         return ID_habitacion;
     }

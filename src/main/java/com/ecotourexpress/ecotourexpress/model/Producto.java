@@ -33,6 +33,9 @@ public class Producto {
     @Min(value = 0, message = "La cantidad no debe ser negativa")
     private int Cantidad_disponible;
 
+    @Column
+    private String Descripcion_p;
+
     @ManyToMany (mappedBy = "productos")
     @JsonIgnore
     private List<Cliente> clientes;

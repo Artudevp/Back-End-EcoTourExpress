@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version>
+		<version>3.3.5</version>
 		<relativePath/>
 	</parent>
 	<groupId>com.ecotourexpress</groupId>
@@ -44,7 +44,6 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.24</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -92,8 +91,7 @@
 		<plugins>
         <plugin>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-            <version>3.3.4</version> <!-- O la última versión disponible -->
+            <artifactId>spring-boot-maven-plugin</artifactId> <!-- O la última versión disponible -->
             <configuration>
                 <excludes>
                     <exclude>
@@ -105,8 +103,7 @@
         </plugin>
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>3.8.1</version> <!-- O la última versión disponible -->
+            <artifactId>maven-compiler-plugin</artifactId> <!-- O la última versión disponible -->
             <configuration>
                 <source>${java.version}</source>
                 <target>${java.version}</target>

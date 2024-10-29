@@ -36,10 +36,21 @@ public class AuthService {
         if (request.getRol() == Rol.ROLE_ADMIN && currentUser == null) {
             throw new IllegalStateException("Solo los administradores pueden crear otros administradores.");
         }
-    
+
+        // Verifica si el correo ya está registrado
+        if (userRepository.existsByCorreo(request.getCorreo())) {
+            throw new IllegalArgumentException("El correo " + request.getCorreo() + " ya está registrado.");
+        }
+
+        // Verifica si el nombre de usuario ya está registrado
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("El nombre de usuario " + request.getUsername() + " ya está registrado.");
+        }
+
         // Determinar el rol del usuario, asignar ROLE_USER si no es especificado o si el usuario no es admin
         Rol userRol = (request.getRol() != null && currentUser != null) ? request.getRol() : Rol.ROLE_USER;
-    
+
+        // Crear y guardar el usuario
         User user = User.builder()
             .username(request.getUsername())
             .correo(request.getCorreo())
@@ -48,9 +59,10 @@ public class AuthService {
             .apellido(request.getApellido())
             .rol(userRol)
             .build();
-    
+
         userRepository.save(user);
-    
+
+        // Generar y devolver el token de autenticación
         return AuthResponse.builder()
             .token(jwtService.getToken(user))
             .build();

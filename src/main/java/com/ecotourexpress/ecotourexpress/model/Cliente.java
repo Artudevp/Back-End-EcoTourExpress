@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.ecotourexpress.ecotourexpress.model.DTO.ClienteDTO;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
@@ -37,7 +38,7 @@ public class Cliente {
     @Column(nullable = false)
     @Min(value = 18, message = "La edad no puede ser negativa")
     @Max(value = 120, message = "La edad no puede ser mayor a 120 años")
-    private int Edad;
+    private byte Edad;
 
     @Column
     @Pattern(regexp = "[MFO]", message = "El género debe ser 'M', 'F' u 'O'")
@@ -72,4 +73,14 @@ public class Cliente {
     @JsonBackReference
     @JoinColumn(name = "ID_usuario", unique = true)
     private User usuario;
+
+    public ClienteDTO toDTO() {
+        return new ClienteDTO(
+            this.ID_cliente,
+            this.cedula,
+            this.Nombre_cli,
+            this.Edad,
+            this.Genero
+            );
+    }
 }

@@ -52,6 +52,7 @@ public class User implements UserDetails{
     private String correo;
     
     @Column(unique = true, nullable = false)
+    @NotBlank(message = "El nombre de usuario no puede estar vacio")
     private String username;
 
 

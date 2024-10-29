@@ -33,6 +33,9 @@ public class Ruta {
     @Min(value = 1, message = "La capacidad debe ser de al menos")
     private int Capacidad;
 
+    @Column
+    private String Descripcion_ruta;
+
     @ManyToMany(mappedBy = "rutas")
     @JsonIgnore
     private List<Cliente> clientes;

@@ -31,6 +31,9 @@ public class Actividad {
     @Min(value = 1, message = "La capacidad debe ser al menos 1.")
     private int Capacidad;
 
+    @Column
+    private String Descripcion_act;
+
     @ManyToMany(mappedBy = "actividades")
     @JsonIgnore
     private List<Cliente> clientes;
