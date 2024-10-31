@@ -40,6 +40,7 @@ public class HospedajeController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Hospedaje newHospedaje(@Valid @RequestBody Hospedaje hospedaje) {
+        hospedaje.setDisponible(true);
         return hospedajeService.saveHospedaje(hospedaje);
     }
 
@@ -54,6 +55,7 @@ public class HospedajeController {
         hospedaje.setCapacidad(hospedajeDetails.getCapacidad());
         hospedaje.setDisponibilidad(hospedajeDetails.getDisponibilidad());
         hospedaje.setPrecio_hab(hospedajeDetails.getPrecio_hab());
+        hospedaje.setDisponible(true);
 
         final Hospedaje updatedHospedaje = hospedajeService.saveHospedaje(hospedaje);
         return ResponseEntity.ok(updatedHospedaje);

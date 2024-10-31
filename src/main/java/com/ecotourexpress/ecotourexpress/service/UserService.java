@@ -39,15 +39,16 @@ public class UserService {
         user.setContraseña(passwordEncoder.encode(user.getContraseña()));
         return userRepository.save(user);
     }
+    
 
-    // Obtener todos los usuarios de la base de datos
-    public List<User> getAllUsers() {
-        return (List<User>) userRepository.findAll();
+    // Obtener todos los usuarios como UserDTO
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAllUsers();
     }
 
-    // Seleccionar usuario por ID (editar)
-    public Optional<User> getUserById(int id) {
-        return userRepository.findById(id);
+    // Obtener un usuario por ID como UserDTO
+    public Optional<UserDTO> getUserById(int id) {
+        return Optional.ofNullable(userRepository.findUserDTOById((long) id));
     }
 
     // Eliminar usuario

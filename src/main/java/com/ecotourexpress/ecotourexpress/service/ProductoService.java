@@ -23,6 +23,8 @@ public class ProductoService {
         producto.setPrecio_p(productoDTO.getPrecio_P());
         producto.setCantidad_disponible(productoDTO.getCantidad_Disponible());
         producto.setDescripcion_p(productoDTO.getDescripcion_P());
+        producto.setDisponible(true);
+
         return productoRepository.save(producto);
     }
 
@@ -35,7 +37,8 @@ public class ProductoService {
                         producto.getNombre_p(),
                         producto.getPrecio_p(),
                         producto.getCantidad_disponible(),
-                        producto.getDescripcion_p()))
+                        producto.getDescripcion_p(),
+                        producto.isDisponible()))
                 .collect(Collectors.toList());
     }
 

@@ -42,7 +42,6 @@ public class UserController {
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers()
                 .stream()
-                .map(userService::convertToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -55,22 +54,27 @@ public class UserController {
         return userService.convertToDTO(savedUser);
     }
 
-    // Seleccionar user por ID (Editar)
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @Valid @RequestBody UserDTO userDTO) {
-        User user = userService.getUserById(id)
+        UserDTO existingUserDTO = userService.getUserById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User no encontrado con id: " + id));
 
-        user.setNombre(userDTO.getNombre());
-        user.setApellido(userDTO.getApellido());
-        user.setCorreo(userDTO.getCorreo());
-        user.setUsername(userDTO.getUsername());
-        user.setContraseña(passwordEncoder.encode(userDTO.getContraseña())); // Asegúrate de codificar la contraseña
+        // Actualiza los campos del DTO existente con los datos del DTO recibido
+        existingUserDTO.setNombre(userDTO.getNombre());
+        existingUserDTO.setApellido(userDTO.getApellido());
+        existingUserDTO.setCorreo(userDTO.getCorreo());
+        existingUserDTO.setUsername(userDTO.getUsername());
+        existingUserDTO.setContraseña(passwordEncoder.encode(userDTO.getContraseña()));
+        existingUserDTO.setRol(userDTO.getRol());
 
-        final User updatedUser = userService.saveUser(user);
+        // Convierte UserDTO a User y guarda en la base de datos
+        User updatedUser = userService.saveUser(userService.convertToEntity(existingUserDTO));
+
+        // Retorna el User actualizado convertido nuevamente a UserDTO
         return ResponseEntity.ok(userService.convertToDTO(updatedUser));
     }
+
 
     // Eliminar user
     @DeleteMapping("/{id}")

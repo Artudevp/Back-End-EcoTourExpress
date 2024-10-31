@@ -3,12 +3,14 @@ package com.ecotourexpress.ecotourexpress.Auth;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ecotourexpress.ecotourexpress.Jwt.JwtService;
 import com.ecotourexpress.ecotourexpress.model.Rol;
 import com.ecotourexpress.ecotourexpress.model.User;
+import com.ecotourexpress.ecotourexpress.model.DTO.UserDTO;
 import com.ecotourexpress.ecotourexpress.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,13 +25,23 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse login(LoginRequest request) {
+        // Autenticación del usuario
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getContraseña()));
-        UserDetails user = userRepository.findByUsername(request.getUsername()).orElseThrow();
-        String token = jwtService.getToken(user);
+    
+        // Recuperar el usuario y convertirlo a UserDTO
+        UserDTO userDTO = userRepository.findByUsername(request.getUsername())
+                .map(user -> convertToDTO(user))
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el nombre: " + request.getUsername()));
+    
+        // Generar el token usando UserDTO
+        String token = jwtService.getToken(userDTO);
+    
         return AuthResponse.builder()
             .token(token)
             .build();
     }
+    
+
 
     public AuthResponse register(RegisterRequest request, UserDetails currentUser) {
         // Verifica si el usuario actual es admin antes de permitir crear otro admin
@@ -67,5 +79,18 @@ public class AuthService {
             .token(jwtService.getToken(user))
             .build();
     }
+
+    private UserDTO convertToDTO(User user) {
+    return new UserDTO(
+        user.getId(),
+        user.getNombre(),
+        user.getApellido(),
+        user.getCorreo(),
+        user.getUsername(),
+        user.getContraseña(),
+        user.getRol()
+    );
+    }   
+
     
 }

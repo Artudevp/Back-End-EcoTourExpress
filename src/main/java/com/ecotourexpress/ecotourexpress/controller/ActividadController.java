@@ -42,6 +42,7 @@ public class ActividadController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Actividad newActividad(@Valid @RequestBody Actividad actividad) {
+        actividad.setDisponible(true);
         return actividadService.saveActividad(actividad);
     }
 
@@ -56,6 +57,7 @@ public class ActividadController {
         actividad.setDuracion_act(actividadDetails.getDuracion_act());
         actividad.setPrecio_act(actividadDetails.getPrecio_act());
         actividad.setCapacidad(actividadDetails.getCapacidad());
+        actividad.setDisponible(true);
 
         final Actividad updatedActividad = actividadService.saveActividad(actividad);
         return ResponseEntity.ok(updatedActividad);

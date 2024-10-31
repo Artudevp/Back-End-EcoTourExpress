@@ -41,12 +41,15 @@ public class ProductoController {
     public ProductoDTO newProducto(@Valid @RequestBody ProductoDTO productoDTO) {
         Producto producto = productoService.saveProducto(productoDTO);
         return new ProductoDTO(producto.getID_producto(),
-                               producto.getCategoria(),
-                               producto.getNombre_p(),
-                               producto.getPrecio_p(),
-                               producto.getCantidad_disponible(),
-                               producto.getDescripcion_p());
+                            producto.getCategoria(),
+                            producto.getNombre_p(),
+                            producto.getPrecio_p(),
+                            producto.getCantidad_disponible(),
+                            producto.getDescripcion_p(),
+                            producto.isDisponible());
     }
+
+
 
     // Seleccionar producto por ID (editar)
     @PutMapping("/{id}")
@@ -59,6 +62,7 @@ public class ProductoController {
         producto.setCategoria(productoDetails.getCategoria());
         producto.setPrecio_p(productoDetails.getPrecio_P());
         producto.setCantidad_disponible(productoDetails.getCantidad_Disponible());
+        producto.setDisponible(true);
 
         final Producto updatedProducto = productoService.saveProducto(productoDetails);
         return ResponseEntity.ok(new ProductoDTO(updatedProducto.getID_producto(),
@@ -66,7 +70,8 @@ public class ProductoController {
                                                   updatedProducto.getNombre_p(),
                                                   updatedProducto.getPrecio_p(),
                                                   updatedProducto.getCantidad_disponible(),
-                                                  updatedProducto.getDescripcion_p()));
+                                                  updatedProducto.getDescripcion_p(),
+                                                  updatedProducto.isDisponible()));
     }
 
     // Eliminar producto

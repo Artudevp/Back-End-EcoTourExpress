@@ -143,11 +143,12 @@ public class ClienteController {
     }
 
     // Eliminar productos del cliente
+    // Eliminar productos del cliente
     @DeleteMapping("/{id_cliente}/productos")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ClienteDTO> removeProductosFromCliente(
-            @PathVariable int id_cliente, @RequestBody List<Integer> id_productos) {
-        ClienteDTO updatedCliente = clienteService.removeProductoFromCliente(id_cliente, id_productos);
+    public ResponseEntity<ClienteDTO> removeProductosFromCliente(@PathVariable int id_cliente, @RequestBody List<Integer> productoIds) {
+        ClienteDTO updatedCliente = clienteService.removeProductosFromCliente(id_cliente, productoIds);
         return ResponseEntity.ok(updatedCliente);
     }
+
 }

@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @Service
 public class ClienteService {
 
-    // Conexión a repositorios
     @Autowired
     private ClienteRepository clienteRepository;
 
@@ -38,7 +37,7 @@ public class ClienteService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    // Método para convertir Cliente a ClienteDTO
+    // Métodos de conversión entre Cliente y ClienteDTO
     public ClienteDTO convertToDTO(Cliente cliente) {
         return new ClienteDTO(
             cliente.getID_cliente(),
@@ -48,9 +47,7 @@ public class ClienteService {
             cliente.getGenero()
         );
     }
-    
 
-    // Método para convertir ClienteDTO a Cliente
     public Cliente convertToEntity(ClienteDTO clienteDTO) {
         Cliente cliente = new Cliente();
         cliente.setID_cliente(clienteDTO.getID_cliente());
@@ -61,29 +58,28 @@ public class ClienteService {
         return cliente;
     }
 
-    // Guardar o actualizar cliente
+    // Guardar un nuevo Cliente
     public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
         Cliente cliente = convertToEntity(clienteDTO);
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
     }
 
-    // Obtener todos los clientes
+    // Obtener todos los Clientes
     public List<ClienteDTO> getAllClientes() {
-        List<Cliente> clientes = clienteRepository.findAll();
+        List<ClienteDTO> clientes = clienteRepository.findAllClientesDTO();
         return clientes.stream()
-                       .map(this::convertToDTO)
                        .collect(Collectors.toList());
     }
 
-    // Obtener cliente por ID
+    // Obtener Cliente por ID
     public ClienteDTO getClienteById(int id) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
         return convertToDTO(cliente);
     }
 
-    // Editar Cliente
+    // Actualizar un Cliente
     public ClienteDTO updateCliente(int id, ClienteDTO clienteDTO) {
         Cliente clienteExistente = clienteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
@@ -96,14 +92,13 @@ public class ClienteService {
         Cliente clienteActualizado = clienteRepository.save(clienteExistente);
         return convertToDTO(clienteActualizado);
     }
-    
 
-    // Eliminar cliente
+    // Eliminar un Cliente
     public void deleteCliente(int id) {
         clienteRepository.deleteById(id);
     }
 
-    // Añadir actividades al cliente con verificación de capacidad
+    // Añadir actividades al cliente con verificación de disponibilidad
     public ClienteDTO addActividadesToCliente(int id_cliente, List<Integer> actividadIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
@@ -112,28 +107,32 @@ public class ClienteService {
             Actividad existingActividad = actividadRepository.findById(actividadId)
                     .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + actividadId));
     
-            // Verificar que la actividad no esté ya asociada al cliente
-            if (!cliente.getActividades().contains(existingActividad)) {
-                cliente.getActividades().add(existingActividad);
-                // Ajusta la capacidad si es necesario
-                existingActividad.setCapacidad(existingActividad.getCapacidad() - 1);
-                actividadRepository.save(existingActividad); // Guardar cambios en la actividad
+            if (existingActividad.isDisponible()) {
+                if (!cliente.getActividades().contains(existingActividad)) {
+                    cliente.getActividades().add(existingActividad);
+                    existingActividad.setCapacidad(existingActividad.getCapacidad() - 1);
+                    if (existingActividad.getCapacidad() <= 0) {
+                        existingActividad.setDisponible(false);
+                    }
+                    actividadRepository.save(existingActividad);
+                }
+            } else {
+                throw new RuntimeException("La actividad no está disponible.");
             }
         }
     
-        // Guardar cambios en el cliente
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
     }
-    
-    // Obtener actividades del cliente
+
+    // Obtener todas las actividades de un Cliente
     public List<Actividad> getActividadesOfCliente(int id_cliente) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
         return cliente.getActividades();
     }
 
-    // Eliminar actividad del cliente y ajustar la capacidad
+    // Eliminar una actividad del Cliente
     public ClienteDTO removeActividadFromCliente(int id_cliente, int id_actividad) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
@@ -141,13 +140,12 @@ public class ClienteService {
         Actividad actividad = actividadRepository.findById(id_actividad)
                 .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id_actividad));
         
-        // Verificar si la actividad pertenece al cliente antes de eliminarla
         if (cliente.getActividades().contains(actividad)) {
-            // Incrementar la capacidad de la actividad
             actividad.setCapacidad(actividad.getCapacidad() + 1);
-            actividadRepository.save(actividad); // Guardar cambios en la actividad
-
-            // Eliminar la actividad del cliente
+            if (actividad.getCapacidad() > 0) {
+                actividad.setDisponible(true);
+            }
+            actividadRepository.save(actividad);
             cliente.getActividades().remove(actividad);
         } else {
             throw new RuntimeException("La actividad no está asignada a este cliente.");
@@ -157,7 +155,7 @@ public class ClienteService {
         return convertToDTO(savedCliente);
     }
 
-    // Añadir rutas al cliente
+    // Añadir rutas al cliente con verificación de disponibilidad
     public ClienteDTO addRutasToCliente(int id_cliente, List<Integer> rutaIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
@@ -166,44 +164,51 @@ public class ClienteService {
             Ruta rut = rutaRepository.findById(id_ruta)
                     .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrada con id: " + id_ruta));
             
-            // Verificar la capacidad de las actividades
-            boolean capacidadSuficiente = true;
-            for (Actividad actividad : rut.getActividades()) {
-                if (actividad.getCapacidad() <= 0) {
-                    capacidadSuficiente = false;
-                    break;
-                }
-            }
-            
-            if (capacidadSuficiente) {
-                // Decrementar la capacidad de la ruta
-                rut.setCapacidad(rut.getCapacidad() - 1);
-                rutaRepository.save(rut); // Guardar cambios en la ruta
-                
-                // Decrementar la capacidad de cada actividad
+            if (rut.isDisponible()) {
+                boolean capacidadSuficiente = true;
                 for (Actividad actividad : rut.getActividades()) {
-                    actividad.setCapacidad(actividad.getCapacidad() - 1);
-                    actividadRepository.save(actividad); // Guardar cambios en la actividad
+                    if (actividad.getCapacidad() <= 0) {
+                        capacidadSuficiente = false;
+                        break;
+                    }
                 }
+                
+                if (capacidadSuficiente) {
+                    rut.setCapacidad(rut.getCapacidad() - 1);
+                    if (rut.getCapacidad() <= 0) {
+                        rut.setDisponible(false);
+                    }
+                    rutaRepository.save(rut);
+                    
+                    for (Actividad actividad : rut.getActividades()) {
+                        actividad.setCapacidad(actividad.getCapacidad() - 1);
+                        if (actividad.getCapacidad() <= 0) {
+                            actividad.setDisponible(false);
+                        }
+                        actividadRepository.save(actividad);
+                    }
 
-                cliente.getRutas().add(rut); // Agregar la ruta al cliente
+                    cliente.getRutas().add(rut);
+                } else {
+                    throw new RuntimeException("No hay suficiente capacidad en las actividades de la ruta.");
+                }
             } else {
-                throw new RuntimeException("No hay suficiente capacidad en las actividades de la ruta.");
+                throw new RuntimeException("La ruta no está disponible.");
             }
         }
 
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
     }
-    
-    // Obtener rutas del cliente
+
+    // Obtener todas las rutas de un Cliente
     public List<Ruta> getRutasOfCliente(int id_cliente) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
         return cliente.getRutas();
     }
 
-    // Eliminar ruta del cliente y ajustar la capacidad
+    // Eliminar una ruta del Cliente
     public ClienteDTO removeRutaFromCliente(int id_cliente, int id_ruta) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
@@ -211,19 +216,13 @@ public class ClienteService {
         Ruta ruta = rutaRepository.findById(id_ruta)
                 .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrada con id: " + id_ruta));
         
-        // Verificar si la ruta pertenece al cliente antes de eliminarla
         if (cliente.getRutas().contains(ruta)) {
-            // Incrementar la capacidad de la ruta
             ruta.setCapacidad(ruta.getCapacidad() + 1);
-            rutaRepository.save(ruta); // Guardar cambios en la ruta
-
-            // Incrementar la capacidad de cada actividad
-            for (Actividad actividad : ruta.getActividades()) {
-                actividad.setCapacidad(actividad.getCapacidad() + 1);
-                actividadRepository.save(actividad); // Guardar cambios en la actividad
+            if (ruta.getCapacidad() > 0) {
+                ruta.setDisponible(true);
             }
+            rutaRepository.save(ruta);
 
-            // Eliminar la ruta del cliente
             cliente.getRutas().remove(ruta);
         } else {
             throw new RuntimeException("La ruta no está asignada a este cliente.");
@@ -233,104 +232,119 @@ public class ClienteService {
         return convertToDTO(savedCliente);
     }
 
-    // Consultar hospedaje de cliente
-    public Hospedaje getHospedajeOfCliente(int id_cliente) {
+    // Añadir productos al cliente con verificación de disponibilidad
+    public ClienteDTO addProductosToCliente(int id_cliente, List<Integer> productoIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-        return cliente.getHabitacion();
-    }
 
-    // Asignar hospedaje a Cliente
-    public ClienteDTO addHospedajeToCliente(int id_cliente, int id_hospedaje) {
-        Cliente cliente = clienteRepository.findById(id_cliente)
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-    
-        // Buscar el hospedaje usando el ID
-        Hospedaje hos = hospedajeRepository.findById(id_hospedaje)
-                .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + id_hospedaje));
-    
-        // Verificar disponibilidad
-        if (hos.getDisponibilidad() > 0) {
-            cliente.setHabitacion(hos);
-            hos.setDisponibilidad(hos.getDisponibilidad() - 1);
-            hospedajeRepository.save(hos);
-        } else {
-            throw new IllegalStateException("No hay habitaciones disponibles para el hospedaje con id: " + id_hospedaje);
-        }
-    
-        Cliente savedCliente = clienteRepository.save(cliente);
-        return convertToDTO(savedCliente);
-    }
-    
-    // Desasignar hospedaje de cliente
-    public ClienteDTO removeHospedajeFromCliente(int id_cliente) {
-        Cliente cliente = clienteRepository.findById(id_cliente)
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-    
-        Hospedaje hospedaje = cliente.getHabitacion();
-        if (hospedaje != null) {
-            hospedaje.setDisponibilidad(hospedaje.getDisponibilidad() + 1); // Incrementar la disponibilidad
-            hospedajeRepository.save(hospedaje); // Guardar cambios en el hospedaje
-            cliente.setHabitacion(null); // Desasignar el hospedaje del cliente
-        } else {
-            throw new RuntimeException("Este cliente no tiene hospedaje asignado.");
+        for (Integer productoId : productoIds) {
+            Producto existingProducto = productoRepository.findById(productoId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productoId));
+
+            if (existingProducto.getCantidad_disponible() > 0) {
+                existingProducto.setCantidad_disponible(existingProducto.getCantidad_disponible() - 1);
+                if (existingProducto.getCantidad_disponible() == 0) {
+                    existingProducto.setDisponible(false);
+                }
+                productoRepository.save(existingProducto);
+
+                cliente.getProductos().add(existingProducto);
+            } else {
+                throw new RuntimeException("El producto no está disponible o no tiene suficiente cantidad.");
+            }
         }
 
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
     }
 
-    // Consultar productos de cliente
+    // Obtener todos los productos de un Cliente
     public List<Producto> getProductosOfCliente(int id_cliente) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
         return cliente.getProductos();
     }
 
-    // Añadir productos al cliente
-    public ClienteDTO addProductosToCliente(int id_cliente, List<Integer> productoIds) {
+    // Eliminar un producto del Cliente
+    public ClienteDTO removeProductosFromCliente(int id_cliente, List<Integer> productoIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-        
+    
         for (Integer productoId : productoIds) {
             Producto producto = productoRepository.findById(productoId)
                     .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productoId));
     
-            // Verificar que el producto esté disponible
-            if (producto.getCantidad_disponible() > 0) {
-                cliente.getProductos().add(producto);
-                producto.setCantidad_disponible(producto.getCantidad_disponible() - 1); // Decrementar la cantidad disponible
-                productoRepository.save(producto); // Guardar cambios en el producto
+            if (cliente.getProductos().contains(producto)) {
+                producto.setCantidad_disponible(producto.getCantidad_disponible() + 1);
+                if (producto.getCantidad_disponible() > 0) {
+                    producto.setDisponible(true);
+                }
+                productoRepository.save(producto);
+                cliente.getProductos().remove(producto);
             } else {
-                throw new RuntimeException("Producto no disponible: " + producto.getNombre_p());
+                throw new RuntimeException("El producto no está asignado a este cliente.");
             }
         }
-
+    
+        // Guardar el cliente actualizado y retornar el DTO correspondiente
         Cliente savedCliente = clienteRepository.save(cliente);
-        return convertToDTO(savedCliente);
+        return convertToDTO(savedCliente); // Asegúrate de que este método existe y convierte Cliente a ClienteDTO
     }
+    
+        
 
-    public ClienteDTO removeProductoFromCliente(int id_cliente, List<Integer> id_productos) {
+    // Añadir hospedaje al cliente con verificación de disponibilidad
+    public ClienteDTO addHospedajeToCliente(int id_cliente, int hospedajeId) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
-    
-        // Iterar sobre la lista de IDs de productos
-        for (Integer id_producto : id_productos) {
-            Producto producto = productoRepository.findById(id_producto)
-                    .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id_producto));
-    
-            // Verificar que el producto esté asignado al cliente antes de eliminarlo
-            if (cliente.getProductos().contains(producto)) {
-                cliente.getProductos().remove(producto);
-                producto.setCantidad_disponible(producto.getCantidad_disponible() + 1); // Incrementar la cantidad disponible
-                productoRepository.save(producto); // Guardar cambios en el producto
-            } else {
-                throw new RuntimeException("El producto con ID " + id_producto + " no está asignado a este cliente.");
+
+        Hospedaje existingHospedaje = hospedajeRepository.findById(hospedajeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + hospedajeId));
+
+        if (existingHospedaje.getCapacidad() > 0) {
+            existingHospedaje.setCapacidad(existingHospedaje.getCapacidad() - 1);
+            if (existingHospedaje.getCapacidad() == 0) {
+                existingHospedaje.setDisponible(false);
             }
+            hospedajeRepository.save(existingHospedaje);
+
+            cliente.setHabitacion(existingHospedaje);
+        } else {
+            throw new RuntimeException("El hospedaje no está disponible o no tiene suficiente capacidad.");
         }
-    
+
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
     }
-    
+
+    // Obtener el hospedaje de un Cliente
+    public Hospedaje getHospedajeOfCliente(int id_cliente) {
+        Cliente cliente = clienteRepository.findById(id_cliente)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+        return cliente.getHabitacion();
+    }
+
+    // Eliminar el hospedaje del Cliente
+    public ClienteDTO removeHospedajeFromCliente(int id_cliente) {
+        Cliente cliente = clienteRepository.findById(id_cliente)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
+
+        Hospedaje hospedaje = cliente.getHabitacion();
+        if (hospedaje != null) {
+            hospedaje.setCapacidad(hospedaje.getCapacidad() + 1);
+            if (hospedaje.getCapacidad() > 0) {
+                hospedaje.setDisponible(true);
+            }
+            hospedajeRepository.save(hospedaje);
+
+            cliente.setHabitacion(hospedaje);
+        } else {
+            throw new RuntimeException("El cliente no tiene un hospedaje asignado.");
+        }
+
+        Cliente savedCliente = clienteRepository.save(cliente);
+        return convertToDTO(savedCliente);
+    }
+
+
 }

@@ -41,6 +41,7 @@ public class RutaController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Ruta newRuta(@Valid @RequestBody Ruta ruta) {
+        ruta.setDisponible(true);
         return rutaService.saveRuta(ruta);
     }
 
@@ -55,6 +56,7 @@ public class RutaController {
         ruta.setDuración_ruta(rutaDetails.getDuración_ruta());
         ruta.setPrecio(rutaDetails.getPrecio());
         ruta.setCapacidad(rutaDetails.getCapacidad());
+        ruta.setDisponible(true);
 
         final Ruta updatedRuta = rutaService.saveRuta(ruta);
         return ResponseEntity.ok(updatedRuta);
