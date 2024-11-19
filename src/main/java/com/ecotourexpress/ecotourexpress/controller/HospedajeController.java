@@ -51,11 +51,12 @@ public class HospedajeController {
         Hospedaje hospedaje = hospedajeService.getHospedajeById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + id));
 
-        hospedaje.setTipo_hab(hospedajeDetails.getTipo_hab());
+        hospedaje.setTipo(hospedajeDetails.getTipo());
         hospedaje.setCapacidad(hospedajeDetails.getCapacidad());
-        hospedaje.setDisponibilidad(hospedajeDetails.getDisponibilidad());
-        hospedaje.setPrecio_hab(hospedajeDetails.getPrecio_hab());
+        hospedaje.setCantidad(hospedajeDetails.getCantidad());
+        hospedaje.setPrecio(hospedajeDetails.getPrecio());
         hospedaje.setDisponible(true);
+        hospedaje.setDescripcion(hospedajeDetails.getDescripcion());
 
         final Hospedaje updatedHospedaje = hospedajeService.saveHospedaje(hospedaje);
         return ResponseEntity.ok(updatedHospedaje);

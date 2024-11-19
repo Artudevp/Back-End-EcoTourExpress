@@ -12,7 +12,7 @@ import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundExcept
 import com.ecotourexpress.ecotourexpress.config.exception.UsernameYaRegistradoException;
 import com.ecotourexpress.ecotourexpress.model.Cliente;
 import com.ecotourexpress.ecotourexpress.model.User;
-import com.ecotourexpress.ecotourexpress.model.DTO.UserDTO;
+import com.ecotourexpress.ecotourexpress.model.dto.UserDTO;
 import com.ecotourexpress.ecotourexpress.repository.ClienteRepository;
 import com.ecotourexpress.ecotourexpress.repository.UserRepository;
 
@@ -95,6 +95,27 @@ public class UserService {
         }
 
         return userRepository.save(usuario);
+    }
+
+    // Desvincular usuario de cliente existente
+    public User desvincularClienteDeUsuario(int id_usuario) {
+        // Verifica si el usuario existe
+        User usuario = userRepository.findById(id_usuario)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id_usuario));
+
+        // Verifica si el cliente está asociado con el usuario
+        Cliente cliente = usuario.getCliente();
+        if (cliente == null) {
+            throw new ResourceNotFoundException("Este usuario no tiene un cliente asociado.");
+        }
+
+        // Desvincula al cliente del usuario
+        cliente.setUsuario(null);
+        usuario.setCliente(null);
+
+        // Guarda los cambios en ambas entidades
+        clienteRepository.save(cliente); // Desvincula el cliente
+        return userRepository.save(usuario); // Desvincula el usuario
     }
 
     // Convertir User a UserDTO

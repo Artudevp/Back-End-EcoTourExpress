@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ecotourexpress.ecotourexpress.model.Producto;
-import com.ecotourexpress.ecotourexpress.model.DTO.ProductoDTO;
+import com.ecotourexpress.ecotourexpress.model.dto.ProductoDTO;
 import com.ecotourexpress.ecotourexpress.repository.ProductoRepository;
 
 @Service
@@ -18,11 +18,11 @@ public class ProductoService {
     // Crear producto
     public Producto saveProducto(ProductoDTO productoDTO) {
         Producto producto = new Producto();
-        producto.setNombre_p(productoDTO.getNombre_P());
+        producto.setNombre(productoDTO.getNombre());
         producto.setCategoria(productoDTO.getCategoria());
-        producto.setPrecio_p(productoDTO.getPrecio_P());
-        producto.setCantidad_disponible(productoDTO.getCantidad_Disponible());
-        producto.setDescripcion_p(productoDTO.getDescripcion_P());
+        producto.setPrecio(productoDTO.getPrecio());
+        producto.setCantidad(productoDTO.getCantidad());
+        producto.setDescripcion(productoDTO.getDescripcion());
         producto.setDisponible(true);
 
         return productoRepository.save(producto);
@@ -34,10 +34,10 @@ public class ProductoService {
                 .map(producto -> new ProductoDTO(
                         producto.getID_producto(),
                         producto.getCategoria(),
-                        producto.getNombre_p(),
-                        producto.getPrecio_p(),
-                        producto.getCantidad_disponible(),
-                        producto.getDescripcion_p(),
+                        producto.getNombre(),
+                        producto.getPrecio(),
+                        producto.getCantidad(),
+                        producto.getDescripcion(),
                         producto.isDisponible()))
                 .collect(Collectors.toList());
     }
@@ -51,4 +51,10 @@ public class ProductoService {
     public void deleteProducto(int id) {
         productoRepository.deleteById(id);
     }
+
+
+    public Producto saveProducto(Producto producto) {
+        return productoRepository.save(producto);
+    }
+    
 }

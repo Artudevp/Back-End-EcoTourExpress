@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
 import com.ecotourexpress.ecotourexpress.model.Producto;
-import com.ecotourexpress.ecotourexpress.model.DTO.ProductoDTO;
+import com.ecotourexpress.ecotourexpress.model.dto.ProductoDTO;
 import com.ecotourexpress.ecotourexpress.service.ProductoService;
 
 import jakarta.transaction.Transactional;
@@ -42,37 +42,42 @@ public class ProductoController {
         Producto producto = productoService.saveProducto(productoDTO);
         return new ProductoDTO(producto.getID_producto(),
                             producto.getCategoria(),
-                            producto.getNombre_p(),
-                            producto.getPrecio_p(),
-                            producto.getCantidad_disponible(),
-                            producto.getDescripcion_p(),
+                            producto.getNombre(),
+                            producto.getPrecio(),
+                            producto.getCantidad(),
+                            producto.getDescripcion(),
                             producto.isDisponible());
     }
 
 
 
-    // Seleccionar producto por ID (editar)
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductoDTO> updateProducto(@PathVariable int id, @Valid @RequestBody ProductoDTO productoDetails) {
         Producto producto = productoService.getProductoById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
 
-        producto.setNombre_p(productoDetails.getNombre_P());
+        producto.setNombre(productoDetails.getNombre());
         producto.setCategoria(productoDetails.getCategoria());
-        producto.setPrecio_p(productoDetails.getPrecio_P());
-        producto.setCantidad_disponible(productoDetails.getCantidad_Disponible());
+        producto.setPrecio(productoDetails.getPrecio());
+        producto.setCantidad(productoDetails.getCantidad());
         producto.setDisponible(true);
+        producto.setDescripcion(productoDetails.getDescripcion());
 
-        final Producto updatedProducto = productoService.saveProducto(productoDetails);
-        return ResponseEntity.ok(new ProductoDTO(updatedProducto.getID_producto(),
-                                                  updatedProducto.getCategoria(),
-                                                  updatedProducto.getNombre_p(),
-                                                  updatedProducto.getPrecio_p(),
-                                                  updatedProducto.getCantidad_disponible(),
-                                                  updatedProducto.getDescripcion_p(),
-                                                  updatedProducto.isDisponible()));
+        final Producto updatedProducto = productoService.saveProducto(producto);
+        
+        return ResponseEntity.ok(new ProductoDTO(
+            updatedProducto.getID_producto(),
+            updatedProducto.getCategoria(),
+            updatedProducto.getNombre(),
+            updatedProducto.getPrecio(),
+            updatedProducto.getCantidad(),
+            updatedProducto.getDescripcion(),
+            updatedProducto.isDisponible()
+        ));
     }
+
+    
 
     // Eliminar producto
     @DeleteMapping("/{id}")

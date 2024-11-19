@@ -1,4 +1,4 @@
-package com.ecotourexpress.ecotourexpress.model.DTO;
+package com.ecotourexpress.ecotourexpress.model.dto;
 
 import com.ecotourexpress.ecotourexpress.model.Rol;
 

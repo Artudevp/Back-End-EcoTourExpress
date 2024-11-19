@@ -52,10 +52,11 @@ public class RutaController {
         Ruta ruta = rutaService.getRutaById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrado con id: " + id));
         
-        ruta.setNombre_ruta(rutaDetails.getNombre_ruta());
-        ruta.setDuración_ruta(rutaDetails.getDuración_ruta());
+        ruta.setNombre(rutaDetails.getNombre());
+        ruta.setDuracion(rutaDetails.getDuracion());
         ruta.setPrecio(rutaDetails.getPrecio());
         ruta.setCapacidad(rutaDetails.getCapacidad());
+        ruta.setDescripcion(rutaDetails.getDescripcion());
         ruta.setDisponible(true);
 
         final Ruta updatedRuta = rutaService.saveRuta(ruta);

@@ -1,11 +1,10 @@
 package com.ecotourexpress.ecotourexpress.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,88 +15,102 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecotourexpress.ecotourexpress.Auth.AuthResponse;
+import com.ecotourexpress.ecotourexpress.Auth.AuthService;
+import com.ecotourexpress.ecotourexpress.Auth.RegisterRequest;
 import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
 import com.ecotourexpress.ecotourexpress.model.Cliente;
 import com.ecotourexpress.ecotourexpress.model.User;
-import com.ecotourexpress.ecotourexpress.model.DTO.UserDTO;
+import com.ecotourexpress.ecotourexpress.model.dto.UserDTO;
+import com.ecotourexpress.ecotourexpress.repository.UserRepository;
 import com.ecotourexpress.ecotourexpress.service.UserService;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
-@Transactional
 @RequestMapping("/users")
+@Transactional
 public class UserController {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final AuthService authService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserService userService;
+    public UserController(UserRepository userRepository, UserService userService, AuthService authService, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userService = userService;
+        this.authService = authService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    // Obtener lista de users
+    // Obtener lista de usuarios
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> getAllUsers() {
-        return userService.getAllUsers()
-                .stream()
-                .collect(Collectors.toList());
+        return userService.getAllUsers();
     }
 
-    // Agregar o actualizar user
+    // Registrar nuevo usuario
     @PostMapping
     @PreAuthorize("permitAll()")
-    public UserDTO newUser(@Valid @RequestBody UserDTO userDTO) {
-        User user = userService.convertToEntity(userDTO);
-        User savedUser = userService.saveUser(user);
-        return userService.convertToDTO(savedUser);
+    public UserDTO newUser(@Valid @RequestBody RegisterRequest registerRequest, @AuthenticationPrincipal UserDetails currentUser) {
+        AuthResponse authResponse = authService.register(registerRequest, currentUser);
+        User user = authService.getUserFromToken(authResponse.getToken());
+        return authService.convertToDTO(user);
     }
 
+    // Actualizar usuario
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> updateUser(@PathVariable int id, @Valid @RequestBody UserDTO userDTO) {
-        UserDTO existingUserDTO = userService.getUserById(id)
+        User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User no encontrado con id: " + id));
 
-        // Actualiza los campos del DTO existente con los datos del DTO recibido
-        existingUserDTO.setNombre(userDTO.getNombre());
-        existingUserDTO.setApellido(userDTO.getApellido());
-        existingUserDTO.setCorreo(userDTO.getCorreo());
-        existingUserDTO.setUsername(userDTO.getUsername());
-        existingUserDTO.setContraseña(passwordEncoder.encode(userDTO.getContraseña()));
-        existingUserDTO.setRol(userDTO.getRol());
+        existingUser.setNombre(userDTO.getNombre());
+        existingUser.setApellido(userDTO.getApellido());
+        existingUser.setCorreo(userDTO.getCorreo());
+        existingUser.setUsername(userDTO.getUsername());
+        existingUser.setRol(userDTO.getRol());
 
-        // Convierte UserDTO a User y guarda en la base de datos
-        User updatedUser = userService.saveUser(userService.convertToEntity(existingUserDTO));
+        if (userDTO.getContraseña() != null && !userDTO.getContraseña().isEmpty()) {
+            existingUser.setContraseña(passwordEncoder.encode(userDTO.getContraseña()));
+        }
 
-        // Retorna el User actualizado convertido nuevamente a UserDTO
+        User updatedUser = userRepository.save(existingUser);
         return ResponseEntity.ok(userService.convertToDTO(updatedUser));
     }
 
-
-    // Eliminar user
+    // Eliminar usuario
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteUser(@PathVariable int id) {
+    public ResponseEntity<String> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
+        return ResponseEntity.ok("Usuario eliminado correctamente.");
     }
 
-    // Relacionar usuario con cliente existente
+    // Vincular usuario a cliente existente
     @PostMapping("/{id_usuario}/clientes")
-    public ResponseEntity<Object> addClienteToUsuario(@PathVariable int id_usuario, @RequestBody Cliente cliente) {
-        try {
-            User usuarioActualizado = userService.addClienteToUsuario(id_usuario, cliente);
-            return ResponseEntity.ok(userService.convertToDTO(usuarioActualizado));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.badRequest().body("Cliente no encontrado. Por favor, crea un nuevo cliente.");
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> addClienteToUsuario(@PathVariable int id_usuario, @Valid @RequestBody Cliente cliente) {
+        User usuarioActualizado = userService.addClienteToUsuario(id_usuario, cliente);
+        return ResponseEntity.ok(userService.convertToDTO(usuarioActualizado));
     }
 
-    // Relacionar usuario con cliente nuevo
+    // Crear y vincular nuevo cliente
     @PostMapping("/{id_usuario}/clientes/nuevo")
-    public ResponseEntity<UserDTO> crearClienteYAsociar(@PathVariable int id_usuario, @RequestBody Cliente cliente) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> crearClienteYAsociar(@PathVariable int id_usuario, @Valid @RequestBody Cliente cliente) {
         User usuarioActualizado = userService.crearClienteYAsociar(id_usuario, cliente);
         return ResponseEntity.ok(userService.convertToDTO(usuarioActualizado));
+    }
+
+    // Desvincular usuario de cliente
+    @DeleteMapping("/{id_usuario}/clientes")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> desvincularClienteDeUsuario(@PathVariable int id_usuario) {
+        userService.desvincularClienteDeUsuario(id_usuario);
+        return ResponseEntity.ok("Usuario desvinculado correctamente del cliente.");
     }
 }

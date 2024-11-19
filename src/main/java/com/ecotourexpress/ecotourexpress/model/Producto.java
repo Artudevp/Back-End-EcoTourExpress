@@ -20,27 +20,27 @@ public class Producto {
 
     @Column
     @NotBlank(message = "La categoria del producto no puede estar vacía.")
-    private String Categoria;
+    private String categoria;
 
     @Column
     @NotBlank(message = "El nombre del producto no puede estar vacío.")
-    private String Nombre_p;
+    private String nombre;
 
     @Column
     @NotNull(message = "El precio no puede estar vacío")
     @Min(value = 100, message = "El precio mínimo es de 100.")
-    private int Precio_p;
+    private int precio;
 
     @Column
     @Min(value = 0, message = "La cantidad no debe ser negativa.")
     @NotNull(message = "La cantidad disponible no puede estar vacía")
-    private int Cantidad_disponible;
+    private int cantidad;
 
     @Column
-    private String Descripcion_p;
+    private String descripcion;
 
     @Column
-    private boolean Disponible;
+    private boolean disponible;
 
     @ManyToMany (mappedBy = "productos")
     @JsonIgnore
@@ -48,5 +48,5 @@ public class Producto {
 
     public int getID_producto() {
         return ID_producto;
-    }    
+    }
 }

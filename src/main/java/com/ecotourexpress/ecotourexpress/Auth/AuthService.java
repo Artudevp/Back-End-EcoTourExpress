@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.ecotourexpress.ecotourexpress.Jwt.JwtService;
 import com.ecotourexpress.ecotourexpress.model.Rol;
 import com.ecotourexpress.ecotourexpress.model.User;
-import com.ecotourexpress.ecotourexpress.model.DTO.UserDTO;
+import com.ecotourexpress.ecotourexpress.model.dto.UserDTO;
 import com.ecotourexpress.ecotourexpress.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,15 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+
+    public User getUserFromToken(String token) {
+        // Extraer el username del token
+        String username = jwtService.getUsernameFromToken(token);
+
+        // Buscar el usuario en la base de datos
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el username: " + username));
+    }
 
     public AuthResponse login(LoginRequest request) {
         // Autenticación del usuario
@@ -80,7 +89,8 @@ public class AuthService {
             .build();
     }
 
-    private UserDTO convertToDTO(User user) {
+
+    public UserDTO convertToDTO(User user) {
     return new UserDTO(
         user.getId(),
         user.getNombre(),
@@ -90,7 +100,7 @@ public class AuthService {
         user.getContraseña(),
         user.getRol()
     );
-    }   
+    }
 
     
 }

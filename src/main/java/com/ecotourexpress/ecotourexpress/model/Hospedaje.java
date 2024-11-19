@@ -20,32 +20,30 @@ public class Hospedaje {
 
     @Column
     @NotBlank(message = "El tipo de habitacion no puede estar vacio")
-    private String Tipo_hab;
+    private String tipo;
 
     @Column
     @NotNull(message = "La capacidad de habitacion no puede estar vacio")
     @Min(value = 1, message = "La capacidad debe ser al menos 1.")
-    private int Capacidad;
+    private int capacidad;
 
     @Column
     @NotNull(message = "La disponibilidad de habitacion no puede estar vacio")
     @Min(value = 1, message = "La disponibilidad debe ser al menos 1.")
-    private int Disponibilidad;
+    private int cantidad;
 
     @Column
     @NotNull(message = "El precio de habitacion no puede estar vacio")
     @Min(value = 30000, message = "El precio minimo es de 30000")
-    private int Precio_hab; // Precio en pesos (COP)
+    private int precio; // Precio en pesos (COP)
 
     @Column
-    private String Descripcion_hab;
+    private String descripcion;
 
     @Column
-    private boolean Disponible;
+    private boolean disponible;
 
-    public int getID_hospedaje() {
-        return ID_habitacion;
-    }
+    
 
     @OneToMany(mappedBy = "habitacion")
     @JsonIgnore

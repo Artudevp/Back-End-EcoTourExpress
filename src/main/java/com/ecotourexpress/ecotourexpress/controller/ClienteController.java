@@ -11,7 +11,7 @@ import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.model.Hospedaje;
 import com.ecotourexpress.ecotourexpress.model.Producto;
 import com.ecotourexpress.ecotourexpress.model.Ruta;
-import com.ecotourexpress.ecotourexpress.model.DTO.ClienteDTO;
+import com.ecotourexpress.ecotourexpress.model.dto.ClienteDTO;
 import com.ecotourexpress.ecotourexpress.service.ClienteService;
 
 import jakarta.transaction.Transactional;
@@ -142,7 +142,6 @@ public class ClienteController {
         return clienteService.getProductosOfCliente(id_cliente);
     }
 
-    // Eliminar productos del cliente
     // Eliminar productos del cliente
     @DeleteMapping("/{id_cliente}/productos")
     @PreAuthorize("hasRole('ADMIN')")

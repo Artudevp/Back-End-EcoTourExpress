@@ -6,7 +6,7 @@ import com.ecotourexpress.ecotourexpress.model.Producto;
 import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
 import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.model.Ruta;
-import com.ecotourexpress.ecotourexpress.model.DTO.ClienteDTO;
+import com.ecotourexpress.ecotourexpress.model.dto.ClienteDTO;
 import com.ecotourexpress.ecotourexpress.repository.ClienteRepository;
 import com.ecotourexpress.ecotourexpress.repository.HospedajeRepository;
 import com.ecotourexpress.ecotourexpress.repository.ProductoRepository;
@@ -42,7 +42,7 @@ public class ClienteService {
         return new ClienteDTO(
             cliente.getID_cliente(),
             cliente.getCedula(),
-            cliente.getNombre_cli(),
+            cliente.getNombre(),
             cliente.getEdad(),
             cliente.getGenero()
         );
@@ -52,7 +52,7 @@ public class ClienteService {
         Cliente cliente = new Cliente();
         cliente.setID_cliente(clienteDTO.getID_cliente());
         cliente.setCedula(clienteDTO.getCedula());
-        cliente.setNombre_cli(clienteDTO.getNombre_cli());
+        cliente.setNombre(clienteDTO.getNombre());
         cliente.setEdad(clienteDTO.getEdad());
         cliente.setGenero(clienteDTO.getGenero());
         return cliente;
@@ -83,14 +83,14 @@ public class ClienteService {
     public ClienteDTO updateCliente(int id, ClienteDTO clienteDTO) {
         Cliente clienteExistente = clienteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
-
-        clienteExistente.setNombre_cli(clienteDTO.getNombre_cli());
+    
+        clienteExistente.setNombre(clienteDTO.getNombre());
         clienteExistente.setEdad(clienteDTO.getEdad());
         clienteExistente.setGenero(clienteDTO.getGenero());
         clienteExistente.setCedula(clienteDTO.getCedula());
     
         Cliente clienteActualizado = clienteRepository.save(clienteExistente);
-        return convertToDTO(clienteActualizado);
+        return clienteActualizado.toDTO();
     }
 
     // Eliminar un Cliente
@@ -241,9 +241,9 @@ public class ClienteService {
             Producto existingProducto = productoRepository.findById(productoId)
                     .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productoId));
 
-            if (existingProducto.getCantidad_disponible() > 0) {
-                existingProducto.setCantidad_disponible(existingProducto.getCantidad_disponible() - 1);
-                if (existingProducto.getCantidad_disponible() == 0) {
+            if (existingProducto.getCantidad() > 0) {
+                existingProducto.setCantidad(existingProducto.getCantidad() - 1);
+                if (existingProducto.getCantidad() == 0) {
                     existingProducto.setDisponible(false);
                 }
                 productoRepository.save(existingProducto);
@@ -275,8 +275,8 @@ public class ClienteService {
                     .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + productoId));
     
             if (cliente.getProductos().contains(producto)) {
-                producto.setCantidad_disponible(producto.getCantidad_disponible() + 1);
-                if (producto.getCantidad_disponible() > 0) {
+                producto.setCantidad(producto.getCantidad() + 1);
+                if (producto.getCantidad() > 0) {
                     producto.setDisponible(true);
                 }
                 productoRepository.save(producto);
@@ -301,9 +301,9 @@ public class ClienteService {
         Hospedaje existingHospedaje = hospedajeRepository.findById(hospedajeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + hospedajeId));
 
-        if (existingHospedaje.getCapacidad() > 0) {
-            existingHospedaje.setCapacidad(existingHospedaje.getCapacidad() - 1);
-            if (existingHospedaje.getCapacidad() == 0) {
+        if (existingHospedaje.getCantidad() > 0) {
+            existingHospedaje.setCantidad(existingHospedaje.getCantidad() - 1);
+            if (existingHospedaje.getCantidad() == 0) {
                 existingHospedaje.setDisponible(false);
             }
             hospedajeRepository.save(existingHospedaje);
@@ -331,8 +331,8 @@ public class ClienteService {
 
         Hospedaje hospedaje = cliente.getHabitacion();
         if (hospedaje != null) {
-            hospedaje.setCapacidad(hospedaje.getCapacidad() + 1);
-            if (hospedaje.getCapacidad() > 0) {
+            hospedaje.setCantidad(hospedaje.getCantidad() + 1);
+            if (hospedaje.getCantidad() > 0) {
                 hospedaje.setDisponible(true);
             }
             hospedajeRepository.save(hospedaje);

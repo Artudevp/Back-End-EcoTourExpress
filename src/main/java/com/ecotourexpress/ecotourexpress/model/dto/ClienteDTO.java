@@ -1,18 +1,21 @@
-package com.ecotourexpress.ecotourexpress.model.DTO;
+package com.ecotourexpress.ecotourexpress.model.dto;
 
+
+import com.ecotourexpress.ecotourexpress.model.Genero;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ClienteDTO {
 
     private int ID_cliente;
@@ -23,21 +26,18 @@ public class ClienteDTO {
 
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
-    private String Nombre_cli;
+    private String nombre;
 
     @Min(value = 18, message = "La edad no puede ser negativa")
     @Max(value = 120, message = "La edad no puede ser mayor a 120 años")
-    private byte Edad;
+    private byte edad;
 
-    @Pattern(regexp = "[MFO]", message = "El género debe ser 'M', 'F' u 'O'")
-    private String Genero;
+    private Genero genero;
 
-    public ClienteDTO(Integer cedula, String nombreCli, @Min(value = 18, message = "La edad no puede ser negativa") @Max(value = 120, message = "La edad no puede ser mayor a 120 años") byte edad, String genero) {
+    public ClienteDTO(Integer cedula, String nombre, byte edad, Genero genero) {
         this.cedula = cedula;
-        this.Nombre_cli = nombreCli;
-        this.Edad = edad;
-        this.Genero = genero;
+        this.nombre = nombre;
+        this.edad = edad;
+        this.genero = genero;
     }
-    
-    public ClienteDTO() {}
 }

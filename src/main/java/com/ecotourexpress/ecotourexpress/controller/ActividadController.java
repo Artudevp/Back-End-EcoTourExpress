@@ -53,11 +53,12 @@ public class ActividadController {
         Actividad actividad = actividadService.getActividadById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + id));
 
-        actividad.setNombre_act(actividadDetails.getNombre_act());
-        actividad.setDuracion_act(actividadDetails.getDuracion_act());
-        actividad.setPrecio_act(actividadDetails.getPrecio_act());
+        actividad.setNombre(actividadDetails.getNombre());
+        actividad.setDuracion(actividadDetails.getDuracion());
+        actividad.setPrecio(actividadDetails.getPrecio());
         actividad.setCapacidad(actividadDetails.getCapacidad());
         actividad.setDisponible(true);
+        actividad.setDescripcion(actividadDetails.getDescripcion());
 
         final Actividad updatedActividad = actividadService.saveActividad(actividad);
         return ResponseEntity.ok(updatedActividad);

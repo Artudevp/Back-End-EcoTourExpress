@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ecotourexpress.ecotourexpress.model.User;
-import com.ecotourexpress.ecotourexpress.model.DTO.UserDTO;
+import com.ecotourexpress.ecotourexpress.model.dto.UserDTO;
 
 import java.util.Optional;
 
@@ -15,10 +15,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByCorreo(String correo);
     boolean existsByUsername(String username);
     
-    @Query("SELECT new com.ecotourexpress.ecotourexpress.model.DTO.UserDTO(u.id, u.nombre, u.apellido, u.correo, u.username, u.contraseña, u.rol) FROM User u WHERE u.id = :id")
+    @Query("SELECT new com.ecotourexpress.ecotourexpress.model.dto.UserDTO(u.id, u.nombre, u.apellido, u.correo, u.username, u.contraseña, u.rol) FROM User u WHERE u.id = :id")
     UserDTO findUserDTOById(@Param("id") Long id);
 
-    @Query("SELECT new com.ecotourexpress.ecotourexpress.model.DTO.UserDTO(u.id, u.nombre, u.apellido, u.correo, u.username, u.contraseña, u.rol) FROM User u")
+    @Query("SELECT new com.ecotourexpress.ecotourexpress.model.dto.UserDTO(u.id, u.nombre, u.apellido, u.correo, u.username, u.contraseña, u.rol) FROM User u")
     List<UserDTO> findAllUsers();
 
 }
