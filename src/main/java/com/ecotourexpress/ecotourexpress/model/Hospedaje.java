@@ -16,7 +16,7 @@ public class Hospedaje {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ID_habitacion;
+    private int id;
 
     @Column
     @NotBlank(message = "El tipo de habitacion no puede estar vacio")

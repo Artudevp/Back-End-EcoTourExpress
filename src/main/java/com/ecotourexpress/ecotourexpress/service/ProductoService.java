@@ -32,7 +32,7 @@ public class ProductoService {
     public List<ProductoDTO> getAllProductos() {
         return productoRepository.findAll().stream()
                 .map(producto -> new ProductoDTO(
-                        producto.getID_producto(),
+                        producto.getId(),
                         producto.getCategoria(),
                         producto.getNombre(),
                         producto.getPrecio(),

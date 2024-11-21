@@ -14,7 +14,7 @@ public class Actividad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ID_actividad;
+    private int id;
 
     @Column
     @NotBlank(message = "El nombre de la actividad no puede estar vacío.")

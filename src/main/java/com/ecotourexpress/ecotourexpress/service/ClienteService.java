@@ -40,7 +40,7 @@ public class ClienteService {
     // Métodos de conversión entre Cliente y ClienteDTO
     public ClienteDTO convertToDTO(Cliente cliente) {
         return new ClienteDTO(
-            cliente.getID_cliente(),
+            cliente.getId(),
             cliente.getCedula(),
             cliente.getNombre(),
             cliente.getEdad(),
@@ -50,7 +50,7 @@ public class ClienteService {
 
     public Cliente convertToEntity(ClienteDTO clienteDTO) {
         Cliente cliente = new Cliente();
-        cliente.setID_cliente(clienteDTO.getID_cliente());
+        cliente.setId(clienteDTO.getId());
         cliente.setCedula(clienteDTO.getCedula());
         cliente.setNombre(clienteDTO.getNombre());
         cliente.setEdad(clienteDTO.getEdad());
@@ -324,7 +324,7 @@ public class ClienteService {
         return cliente.getHabitacion();
     }
 
-    // Eliminar el hospedaje del Cliente
+    // Método para eliminar el hospedaje del cliente
     public ClienteDTO removeHospedajeFromCliente(int id_cliente) {
         Cliente cliente = clienteRepository.findById(id_cliente)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id_cliente));
@@ -337,7 +337,7 @@ public class ClienteService {
             }
             hospedajeRepository.save(hospedaje);
 
-            cliente.setHabitacion(hospedaje);
+            cliente.setHabitacion(null);
         } else {
             throw new RuntimeException("El cliente no tiene un hospedaje asignado.");
         }
@@ -345,6 +345,7 @@ public class ClienteService {
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
     }
+
 
 
 }

@@ -14,10 +14,10 @@ public interface ClienteRepository extends CrudRepository<Cliente, Integer> {
     Cliente findByCedula(@Param("cedula") Integer cedula);
     boolean existsByCedula(Integer cedula);
 
-    @Query("SELECT new com.ecotourexpress.ecotourexpress.model.dto.ClienteDTO(c.cedula, c.nombre, c.edad, c.genero) FROM Cliente c WHERE c.ID_cliente = :id")
-    ClienteDTO findClienteDTOById(@Param("id") Long id);
+    @Query("SELECT new com.ecotourexpress.ecotourexpress.model.dto.ClienteDTO(c.cedula, c.nombre, c.edad, c.genero) FROM Cliente c WHERE c.id = :id")
+    ClienteDTO findClienteDTOById(@Param("id") int id);
     
-    @Query("SELECT new com.ecotourexpress.ecotourexpress.model.dto.ClienteDTO(c.ID_cliente, c.cedula, c.nombre, c.edad, c.genero) FROM Cliente c")
+    @Query("SELECT new com.ecotourexpress.ecotourexpress.model.dto.ClienteDTO(c.id, c.cedula, c.nombre, c.edad, c.genero) FROM Cliente c")
     List<ClienteDTO> findAllClientesDTO();
 
 }

@@ -16,7 +16,7 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ID_producto;
+    private int id;
 
     @Column
     @NotBlank(message = "La categoria del producto no puede estar vacía.")
@@ -46,7 +46,7 @@ public class Producto {
     @JsonIgnore
     private List<Cliente> clientes;
 
-    public int getID_producto() {
-        return ID_producto;
+    public int getId() {
+        return id;
     }
 }

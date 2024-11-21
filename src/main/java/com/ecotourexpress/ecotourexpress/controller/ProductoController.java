@@ -40,7 +40,7 @@ public class ProductoController {
     @PreAuthorize("hasRole('ADMIN')")
     public ProductoDTO newProducto(@Valid @RequestBody ProductoDTO productoDTO) {
         Producto producto = productoService.saveProducto(productoDTO);
-        return new ProductoDTO(producto.getID_producto(),
+        return new ProductoDTO(producto.getId(),
                             producto.getCategoria(),
                             producto.getNombre(),
                             producto.getPrecio(),
@@ -67,7 +67,7 @@ public class ProductoController {
         final Producto updatedProducto = productoService.saveProducto(producto);
         
         return ResponseEntity.ok(new ProductoDTO(
-            updatedProducto.getID_producto(),
+            updatedProducto.getId(),
             updatedProducto.getCategoria(),
             updatedProducto.getNombre(),
             updatedProducto.getPrecio(),

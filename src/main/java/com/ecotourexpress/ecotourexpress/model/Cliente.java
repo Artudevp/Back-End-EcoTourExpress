@@ -24,7 +24,7 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ID_cliente;
+    private int id;
 
     @Column(unique = true, nullable = false)
     @NotNull(message = "La cédula no puede ser nula")
@@ -45,38 +45,38 @@ public class Cliente {
     private Genero genero;
 
     @ManyToOne
-    @JoinColumn(name = "ID_habitacion")
+    @JoinColumn(name = "habitacion")
     private Hospedaje habitacion;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "cliente_actividad", 
-        joinColumns = @JoinColumn(name = "ID_cliente"),
-        inverseJoinColumns = @JoinColumn(name = "ID_actividad"))
+        joinColumns = @JoinColumn(name = "cliente"),
+        inverseJoinColumns = @JoinColumn(name = "actividad"))
     private List<Actividad> actividades;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "cliente_ruta",
-        joinColumns = @JoinColumn(name = "ID_cliente"),
-        inverseJoinColumns = @JoinColumn(name = "ID_ruta"))
+        joinColumns = @JoinColumn(name = "cliente"),
+        inverseJoinColumns = @JoinColumn(name = "ruta"))
     private List<Ruta> rutas;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "cliente_producto",
-        joinColumns = @JoinColumn(name = "ID_cliente"),
-        inverseJoinColumns = @JoinColumn(name = "ID_producto"))
+        joinColumns = @JoinColumn(name = "cliente"),
+        inverseJoinColumns = @JoinColumn(name = "producto"))
     private List<Producto> productos;
     
     @OneToOne
     @JsonBackReference
-    @JoinColumn(name = "ID_usuario", unique = true)
+    @JoinColumn(name = "usuario", unique = true)
     private User usuario;
 
     public ClienteDTO toDTO() {
         return new ClienteDTO(
-            this.ID_cliente,
+            this.id,
             this.cedula,
             this.nombre,
             this.edad,

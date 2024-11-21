@@ -16,7 +16,7 @@ public class Ruta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int ID_ruta;
+    private int id;
 
     @Column
     @NotBlank(message = "El nombre de la ruta no puede estar vacio.")
@@ -50,8 +50,8 @@ public class Ruta {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "ruta_actividad",
-        joinColumns = @JoinColumn(name = "ID_ruta"),
-        inverseJoinColumns = @JoinColumn(name = "ID_actividad")
+        joinColumns = @JoinColumn(name = "ruta"),
+        inverseJoinColumns = @JoinColumn(name = "actividad")
     )
     private List<Actividad> actividades;
 }

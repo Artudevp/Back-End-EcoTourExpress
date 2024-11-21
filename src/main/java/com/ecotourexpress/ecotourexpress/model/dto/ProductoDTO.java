@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class ProductoDTO {
 
-    private int ID_producto;
+    private int id;
 
     @NotBlank(message = "La categoria del producto no puede estar vacía.")
     private String categoria;

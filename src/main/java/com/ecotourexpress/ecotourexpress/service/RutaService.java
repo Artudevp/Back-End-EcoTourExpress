@@ -49,8 +49,8 @@ public class RutaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrada con id: " + id_ruta));
         
         for (Actividad actividad : actividades) {
-            Actividad act = actividadRepository.findById(actividad.getID_actividad())
-                    .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + actividad.getID_actividad()));
+            Actividad act = actividadRepository.findById(actividad.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + actividad.getId()));
             ruta.getActividades().add(act);
         }
 
@@ -71,7 +71,7 @@ public class RutaService {
         Ruta ruta = rutaRepository.findById(id_ruta)
                 .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrada con id: " + id_ruta));
 
-        ruta.getActividades().removeIf(actividad -> actividad.getID_actividad() == id_actividad);
+        ruta.getActividades().removeIf(actividad -> actividad.getId() == id_actividad);
         return rutaRepository.save(ruta);
     }
 }

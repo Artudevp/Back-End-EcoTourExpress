@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClienteDTO {
 
-    private int ID_cliente;
+    private int id;
 
     @NotNull(message = "La cédula no puede ser nula")
     @Positive(message = "La cédula debe ser un número positivo")
