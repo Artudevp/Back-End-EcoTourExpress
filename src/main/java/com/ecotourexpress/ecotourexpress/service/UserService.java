@@ -57,13 +57,13 @@ public class UserService {
     }
 
     // Relacionar usuario con Cliente existente
-    public User addClienteToUsuario(int id_usuario, Cliente cliente) {
+    public User addClienteToUsuario(int id_usuario, Integer cedulaCliente) {
         // Verifica si el usuario existe
         User usuario = userRepository.findById(id_usuario)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id_usuario));
-
+    
         // Verifica si el cliente ya existe
-        Cliente clienteExistente = clienteRepository.findByCedula(cliente.getCedula());
+        Cliente clienteExistente = clienteRepository.findByCedula(cedulaCliente);
         if (clienteExistente != null) {
             clienteExistente.setUsuario(usuario);
             usuario.setCliente(clienteExistente);
@@ -72,9 +72,10 @@ public class UserService {
             // Si el cliente no existe, lanza una excepción o devuelve un mensaje
             throw new ResourceNotFoundException("Cliente no encontrado. Por favor, crea un nuevo cliente.");
         }
-
+    
         return userRepository.save(usuario);
     }
+    
 
     // Relacionar usuario a cliente nuevo
     public User crearClienteYAsociar(int id_usuario, Cliente cliente) {

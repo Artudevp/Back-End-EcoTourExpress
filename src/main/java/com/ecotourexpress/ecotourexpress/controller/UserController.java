@@ -21,6 +21,7 @@ import com.ecotourexpress.ecotourexpress.Auth.RegisterRequest;
 import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
 import com.ecotourexpress.ecotourexpress.model.Cliente;
 import com.ecotourexpress.ecotourexpress.model.User;
+import com.ecotourexpress.ecotourexpress.model.dto.ClienteRequestDTO;
 import com.ecotourexpress.ecotourexpress.model.dto.UserDTO;
 import com.ecotourexpress.ecotourexpress.repository.UserRepository;
 import com.ecotourexpress.ecotourexpress.service.UserService;
@@ -93,8 +94,10 @@ public class UserController {
     // Vincular usuario a cliente existente
     @PostMapping("/{id_usuario}/clientes")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> addClienteToUsuario(@PathVariable int id_usuario, @Valid @RequestBody Cliente cliente) {
-        User usuarioActualizado = userService.addClienteToUsuario(id_usuario, cliente);
+    public ResponseEntity<UserDTO> addClienteToUsuario(
+            @PathVariable int id_usuario,
+            @Valid @RequestBody ClienteRequestDTO clienteDTO) {
+        User usuarioActualizado = userService.addClienteToUsuario(id_usuario, clienteDTO.getCedula());
         return ResponseEntity.ok(userService.convertToDTO(usuarioActualizado));
     }
 
