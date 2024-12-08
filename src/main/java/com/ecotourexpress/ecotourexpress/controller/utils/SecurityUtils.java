@@ -1,4 +1,4 @@
-package com.ecotourexpress.ecotourexpress.controller;
+package com.ecotourexpress.ecotourexpress.controller.utils;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;

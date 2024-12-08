@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import com.ecotourexpress.ecotourexpress.controller.utils.AuditoriaUtils;
+import com.ecotourexpress.ecotourexpress.controller.utils.SecurityUtils;
 import com.ecotourexpress.ecotourexpress.model.Actividad;
 import com.ecotourexpress.ecotourexpress.model.Hospedaje;
 import com.ecotourexpress.ecotourexpress.model.Producto;
@@ -98,8 +101,7 @@ public class ClienteController {
             int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
         
         
-        // AuditoriaUtils.registrarAccion("ASOCIAR", "Actividad", 
-        //    "Cliente o administrador asoció actividades " + actividadIds + " al cliente con ID: " + finalClientId);
+        AuditoriaUtils.registrarAccion("ASOCIAR", "Actividad", "Cliente o administrador asoció actividades " + actividadIds + " al cliente con ID: " + finalClientId);
 
         return clienteService.addActividadesToCliente(finalClientId, actividadIds);
     }
@@ -114,8 +116,8 @@ public class ClienteController {
             int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
     
         
-        // AuditoriaUtils.registrarAccion("ELIMINAR", "Actividad", 
-        //    "Cliente o administrador eliminó la actividad con ID: " + id_actividad + " del cliente con ID: " + finalClientId);
+        AuditoriaUtils.registrarAccion("ELIMINAR", "Actividad", 
+           "Cliente o administrador eliminó la actividad con ID: " + id_actividad + " del cliente con ID: " + finalClientId);
 
         return clienteService.removeActividadFromCliente(finalClientId, id_actividad);
     }
@@ -143,9 +145,9 @@ public class ClienteController {
         int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
         int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
 
-        // AuditoriaUtils.registrarAccion("ASOCIAR", "Ruta", 
-        //         String.format("Usuario autenticado con ID %d asoció las rutas %s al cliente con ID: %d",
-        //                 authenticatedClientId, rutaIds, finalClientId));
+        AuditoriaUtils.registrarAccion("ASOCIAR", "Ruta", 
+                String.format("Usuario autenticado con ID %d asoció las rutas %s al cliente con ID: %d",
+                        authenticatedClientId, rutaIds, finalClientId));
 
         return clienteService.addRutasToCliente(finalClientId, rutaIds);
     }
@@ -159,9 +161,9 @@ public class ClienteController {
         int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
         int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
 
-        // AuditoriaUtils.registrarAccion("ELIMINAR", "Ruta", 
-        //         String.format("Usuario autenticado con ID %d eliminó la ruta %d del cliente con ID: %d",
-        //                 authenticatedClientId, id_ruta, finalClientId));
+        AuditoriaUtils.registrarAccion("ELIMINAR", "Ruta", 
+                String.format("Usuario autenticado con ID %d eliminó la ruta %d del cliente con ID: %d",
+                        authenticatedClientId, id_ruta, finalClientId));
 
         return clienteService.removeRutaFromCliente(finalClientId, id_ruta);
     }
@@ -189,9 +191,9 @@ public class ClienteController {
         int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
         int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
 
-        // AuditoriaUtils.registrarAccion("ASOCIAR", "Hospedaje", 
-        //         String.format("Usuario autenticado con ID %d asignó el hospedaje %d al cliente con ID: %d",
-        //                 authenticatedClientId, id_hospedaje, finalClientId));
+        AuditoriaUtils.registrarAccion("ASOCIAR", "Hospedaje", 
+                String.format("Usuario autenticado con ID %d asignó el hospedaje %d al cliente con ID: %d",
+                        authenticatedClientId, id_hospedaje, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.addHospedajeToCliente(finalClientId, id_hospedaje);
         return ResponseEntity.ok(updatedCliente);
@@ -204,9 +206,9 @@ public class ClienteController {
         int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
         int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
 
-        // AuditoriaUtils.registrarAccion("ELIMINAR", "Hospedaje", 
-        //         String.format("Usuario autenticado con ID %d eliminó el hospedaje del cliente con ID: %d",
-        //                 authenticatedClientId, finalClientId));
+        AuditoriaUtils.registrarAccion("ELIMINAR", "Hospedaje", 
+                String.format("Usuario autenticado con ID %d eliminó el hospedaje del cliente con ID: %d",
+                        authenticatedClientId, finalClientId));
 
         return clienteService.removeHospedajeFromCliente(finalClientId);
     }
@@ -234,9 +236,9 @@ public class ClienteController {
         int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
         int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
 
-        // AuditoriaUtils.registrarAccion("ASOCIAR", "Producto", 
-        //         String.format("Usuario autenticado con ID %d asoció los productos %s al cliente con ID: %d",
-        //                 authenticatedClientId, id_productos, finalClientId));
+        AuditoriaUtils.registrarAccion("ASOCIAR", "Producto", 
+                String.format("Usuario autenticado con ID %d asoció los productos %s al cliente con ID: %d",
+                        authenticatedClientId, id_productos, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.addProductosToCliente(finalClientId, id_productos);
         return ResponseEntity.ok(updatedCliente);
@@ -251,9 +253,9 @@ public class ClienteController {
         int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
         int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
 
-        // AuditoriaUtils.registrarAccion("ELIMINAR", "Producto", 
-        //         String.format("Usuario autenticado con ID %d eliminó los productos %s del cliente con ID: %d",
-        //                 authenticatedClientId, productoIds, finalClientId));
+        AuditoriaUtils.registrarAccion("ELIMINAR", "Producto", 
+                String.format("Usuario autenticado con ID %d eliminó los productos %s del cliente con ID: %d",
+                        authenticatedClientId, productoIds, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.removeProductosFromCliente(finalClientId, productoIds);
         return ResponseEntity.ok(updatedCliente);
