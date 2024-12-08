@@ -18,6 +18,13 @@ public class SecurityUtils {
         return requestClientId != null ? requestClientId : authenticatedClientId;
     }
 
+    public static int validateAndGetUserId(Integer requestUserId, int authenticatedUserId) {
+        if (!isAdmin() && (requestUserId != null && !requestUserId.equals(authenticatedUserId))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para realizar esta accion.");
+        }
+        return requestUserId != null ? requestUserId : authenticatedUserId;
+    }
+
     public static boolean isAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null &&

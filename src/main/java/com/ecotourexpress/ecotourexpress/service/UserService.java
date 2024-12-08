@@ -68,6 +68,11 @@ public class UserService {
     // Métodos para relacionar clientes
     // ==========================================
 
+    // Ver cliente relacionado a usuario
+    public Optional<Cliente> getClienteOfUser(int id_usuario){
+        return clienteRepository.findByUsuarioId(id_usuario);
+    }
+
 
     // Relacionar usuario con Cliente existente
     public User addClienteToUsuario(int id_usuario, Integer cedulaCliente) {

@@ -1,6 +1,8 @@
 package com.ecotourexpress.ecotourexpress.controller;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +21,7 @@ import com.ecotourexpress.ecotourexpress.Auth.AuthResponse;
 import com.ecotourexpress.ecotourexpress.Auth.AuthService;
 import com.ecotourexpress.ecotourexpress.Auth.RegisterRequest;
 import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
+import com.ecotourexpress.ecotourexpress.controller.utils.SecurityUtils;
 import com.ecotourexpress.ecotourexpress.model.Cliente;
 import com.ecotourexpress.ecotourexpress.model.User;
 import com.ecotourexpress.ecotourexpress.model.dto.ClienteRequestDTO;
@@ -103,29 +106,44 @@ public class UserController {
     // Métodos para relacionar clientes
     // ==========================================
 
-    // Vincular usuario a cliente existente
-    @PostMapping("/{id_usuario}/clientes")
-    @PreAuthorize("hasRole('ADMIN')")
+    // Ver cliente de usuario
+    @GetMapping(value = {"/cliente", "/{id_usuario}/cliente"})
+    @PreAuthorize("hasRole('USER')or hasRole('ADMIN')")
+    public Optional<Cliente> getClienteOfUsuario(@PathVariable(required = false) Integer id_usuario) {
+        int authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        int finalUserId = SecurityUtils.validateAndGetUserId(id_usuario, authenticatedUserId);
+        return userService.getClienteOfUser(finalUserId);
+    }
+
+    // Vincular usuario a cliente existente por medio de cedula
+    @PostMapping(value = {"/cliente", "/{id_usuario}/cliente"})
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<UserDTO> addClienteToUsuario(
-            @PathVariable int id_usuario,
+            @PathVariable(required = false) Integer id_usuario,
             @Valid @RequestBody ClienteRequestDTO clienteDTO) {
-        User usuarioActualizado = userService.addClienteToUsuario(id_usuario, clienteDTO.getCedula());
+        int authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        int finalUserId = SecurityUtils.validateAndGetUserId(id_usuario, authenticatedUserId);
+        User usuarioActualizado = userService.addClienteToUsuario(finalUserId, clienteDTO.getCedula());
         return ResponseEntity.ok(userService.convertToDTO(usuarioActualizado));
     }
 
     // Crear y vincular nuevo cliente
-    @PostMapping("/{id_usuario}/clientes/nuevo")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> crearClienteYAsociar(@PathVariable int id_usuario, @Valid @RequestBody Cliente cliente) {
-        User usuarioActualizado = userService.crearClienteYAsociar(id_usuario, cliente);
+    @PostMapping(value = {"/cliente/nuevo", "/{id_usuario}/cliente/nuevo"})
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<UserDTO> crearClienteYAsociar(@PathVariable(required = false) Integer id_usuario, @Valid @RequestBody Cliente cliente) {
+        int authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        int finalUserId = SecurityUtils.validateAndGetUserId(id_usuario, authenticatedUserId);
+        User usuarioActualizado = userService.crearClienteYAsociar(finalUserId, cliente);
         return ResponseEntity.ok(userService.convertToDTO(usuarioActualizado));
     }
 
     // Desvincular usuario de cliente
-    @DeleteMapping("/{id_usuario}/clientes")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> desvincularClienteDeUsuario(@PathVariable int id_usuario) {
-        userService.desvincularClienteDeUsuario(id_usuario);
+    @DeleteMapping(value = {"/cliente","/{id_usuario}/cliente"})
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<String> desvincularClienteDeUsuario(@PathVariable(required = false) Integer id_usuario) {
+        int authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        int finalUserId = SecurityUtils.validateAndGetUserId(id_usuario, authenticatedUserId);
+        userService.desvincularClienteDeUsuario(finalUserId);
         return ResponseEntity.ok("Usuario desvinculado correctamente del cliente.");
     }
 }
