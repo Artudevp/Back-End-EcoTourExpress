@@ -1,6 +1,7 @@
 package com.ecotourexpress.ecotourexpress.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -20,4 +21,5 @@ public interface ClienteRepository extends CrudRepository<Cliente, Integer> {
     @Query("SELECT new com.ecotourexpress.ecotourexpress.model.dto.ClienteDTO(c.id, c.cedula, c.nombre, c.edad, c.genero) FROM Cliente c")
     List<ClienteDTO> findAllClientesDTO();
 
+    Optional<Cliente> findByUsuarioId(int userId);
 }

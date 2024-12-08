@@ -1,7 +1,6 @@
 package com.ecotourexpress.ecotourexpress.Jwt;
 
 import java.security.Key;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,15 +25,13 @@ public class JwtService {
 
     private static final String SECRET_KEY = "586E3272357538782F413F4428472B4B6250655368566B597033733676397924";
 
-    // Método existente para User
     public String getToken(User user) {
         return getToken(new HashMap<>(), user);
     }
 
-    // Nuevo método sobrecargado para UserDTO
     public String getToken(UserDTO userDTO) {
-        // Convertir UserDTO a User si es necesario, o crear un nuevo método para esto
-        User user = new User(); // Asumiendo que tienes un constructor vacío
+
+        User user = new User();
         user.setId(userDTO.getId());
         user.setNombre(userDTO.getNombre());
         user.setApellido(userDTO.getApellido());
@@ -46,13 +43,14 @@ public class JwtService {
     }
 
     private String getToken(Map<String, Object> extraClaims, UserDetails user) {
-        // Obtener los roles del usuario y agregarlos a extraClaims
-        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
-        String role = authorities.stream()
-                                 .map(GrantedAuthority::getAuthority)
-                                 .collect(Collectors.joining(","));
-        extraClaims.put("role", role);
-
+        if (user instanceof User usuario) {
+            extraClaims.put("userId", usuario.getId()); 
+            String role = usuario.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.joining(","));
+            extraClaims.put("role", role);
+        }
+    
         return Jwts
             .builder()
             .setClaims(extraClaims)
