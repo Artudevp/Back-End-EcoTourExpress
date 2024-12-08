@@ -22,7 +22,8 @@ import jakarta.validation.constraints.Min;
 @Transactional
 @RequestMapping("/clientes")
 public class ClienteController {
-
+    
+    //Conexion a repositorio y service
     @Autowired
     private ClienteService clienteService;
 
@@ -73,7 +74,7 @@ public class ClienteController {
     }
 
     // ==========================================
-    // ACTIVIDADES CLIENTES
+    // ACTIVIDADES - CLIENTES
     // Métodos para manejar las actividades
     // ==========================================
 
@@ -120,7 +121,7 @@ public class ClienteController {
     }
 
     // ==========================================
-    // RUTAS CLIENTES
+    // RUTAS - CLIENTES
     // Métodos para manejar las rutas
     // ==========================================
 
@@ -166,7 +167,7 @@ public class ClienteController {
     }
 
     // ==========================================
-    // HOSPEDAJE CLIENTES
+    // HOSPEDAJE - CLIENTES
     // Métodos para manejar el hospedaje
     // ==========================================
 
@@ -211,7 +212,7 @@ public class ClienteController {
     }
 
     // ==========================================
-    // PRODUCTOS CLIENTES
+    // PRODUCTOS - CLIENTES
     // Métodos para manejar los productos
     // ==========================================
 

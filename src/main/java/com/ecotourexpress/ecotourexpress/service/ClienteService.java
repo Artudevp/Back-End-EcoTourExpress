@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class ClienteService {
 
+    //Conexion a repositorios
     @Autowired
     private ClienteRepository clienteRepository;
 
@@ -47,7 +48,6 @@ public class ClienteService {
             cliente.getGenero()
         );
     }
-
     public Cliente convertToEntity(ClienteDTO clienteDTO) {
         Cliente cliente = new Cliente();
         cliente.setId(clienteDTO.getId());
@@ -57,6 +57,11 @@ public class ClienteService {
         cliente.setGenero(clienteDTO.getGenero());
         return cliente;
     }
+
+    // ==========================================
+    // CRUD CLIENTES
+    // Métodos para manejar las operaciones CRUD
+    // ==========================================
 
     // Guardar un nuevo Cliente
     public ClienteDTO saveCliente(ClienteDTO clienteDTO) {
@@ -97,6 +102,11 @@ public class ClienteService {
     public void deleteCliente(int id) {
         clienteRepository.deleteById(id);
     }
+
+    // ==========================================
+    // ACTIVIDADES - CLIENTES
+    // Métodos para manejar las actividades
+    // ==========================================
 
     // Añadir actividades al cliente con verificación de disponibilidad
     public ClienteDTO addActividadesToCliente(int id_cliente, List<Integer> actividadIds) {
@@ -154,6 +164,11 @@ public class ClienteService {
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
     }
+
+    // ==========================================
+    // RUTAS - CLIENTES
+    // Métodos para manejar las rutas
+    // ==========================================
 
     // Añadir rutas al cliente con verificación de disponibilidad
     public ClienteDTO addRutasToCliente(int id_cliente, List<Integer> rutaIds) {
@@ -232,6 +247,12 @@ public class ClienteService {
         return convertToDTO(savedCliente);
     }
 
+    // ==========================================
+    // PRODUCTOS - CLIENTES
+    // Métodos para manejar los productos
+    // ==========================================
+
+
     // Añadir productos al cliente con verificación de disponibilidad
     public ClienteDTO addProductosToCliente(int id_cliente, List<Integer> productoIds) {
         Cliente cliente = clienteRepository.findById(id_cliente)
@@ -291,7 +312,10 @@ public class ClienteService {
         return convertToDTO(savedCliente); // Asegúrate de que este método existe y convierte Cliente a ClienteDTO
     }
     
-        
+    // ==========================================
+    // HOSPEDAJE CLIENTES
+    // Métodos para manejar el hospedaje
+    // ==========================================    
 
     // Añadir hospedaje al cliente con verificación de disponibilidad
     public ClienteDTO addHospedajeToCliente(int id_cliente, int hospedajeId) {
@@ -345,7 +369,4 @@ public class ClienteService {
         Cliente savedCliente = clienteRepository.save(cliente);
         return convertToDTO(savedCliente);
     }
-
-
-
 }

@@ -15,7 +15,6 @@ public class SecurityUtils {
         if (!isAdmin() && (requestClientId != null && !requestClientId.equals(authenticatedClientId))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para realizar esta acción.");
         }
-        // Si no se proporcionó `requestClientId`, se usa el ID autenticado
         return requestClientId != null ? requestClientId : authenticatedClientId;
     }
 

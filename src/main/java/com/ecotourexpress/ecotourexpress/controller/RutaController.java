@@ -29,6 +29,11 @@ public class RutaController {
     // Conexión a Service
     @Autowired
     private RutaService rutaService;
+
+    // ==========================================
+    // CRUD CLIENTES
+    // Métodos para manejar las operaciones CRUD
+    // ==========================================
     
     // Obtener lista de rutas
     @GetMapping
@@ -69,6 +74,11 @@ public class RutaController {
     public void deleteRuta(@PathVariable int id) {
         rutaService.deleteRuta(id);
     }
+
+    // ==========================================
+    // RUTAS - ACTIVIDADES
+    // Métodos para relacionar actividades
+    // ==========================================
 
 
     // Agregar actividades a una ruta

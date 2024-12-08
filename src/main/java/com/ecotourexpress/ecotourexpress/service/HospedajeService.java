@@ -15,6 +15,11 @@ public class HospedajeService {
     @Autowired
     private HospedajeRepository hospedajeRepository;
 
+    // ==========================================
+    // CRUD HOSPEDAJE
+    // Métodos para manejar el CRUD
+    // ==========================================
+
     // Guardar o actualizar hospedaje 
     public Hospedaje saveHospedaje(Hospedaje hospedaje) {
         return hospedajeRepository.save(hospedaje);

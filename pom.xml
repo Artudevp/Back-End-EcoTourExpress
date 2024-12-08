@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.ecotourexpress</groupId>
     <artifactId>ecotourexpress</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.8</version>
     <packaging>war</packaging>
     <name>ecotourexpress</name>
     <description>Demo project for Spring Boot</description>

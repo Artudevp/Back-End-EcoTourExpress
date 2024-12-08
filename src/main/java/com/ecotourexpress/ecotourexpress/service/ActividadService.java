@@ -15,6 +15,11 @@ public class ActividadService {
     @Autowired
     private ActividadRepository actividadRepository;
 
+    // ==========================================
+    // CRUD ACTIVIDADES
+    // Métodos para manejar las operaciones CRUD
+    // ==========================================
+
     // Crear actividad
     public Actividad saveActividad(Actividad actividad) {
         return actividadRepository.save(actividad);

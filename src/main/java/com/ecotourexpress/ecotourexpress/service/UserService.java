@@ -18,7 +18,8 @@ import com.ecotourexpress.ecotourexpress.repository.UserRepository;
 
 @Service
 public class UserService {
-
+    
+    // Conexion a PasswordEncoder y repositorios
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -27,6 +28,12 @@ public class UserService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    // ==========================================
+    // CRUD USUARIOS
+    // Métodos para manejar el CRUD
+    // ==========================================
+
 
     // Crear usuario nuevo
     public User saveUser(User user) {
@@ -55,6 +62,12 @@ public class UserService {
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }
+
+    // ==========================================
+    // USUARIOS - CLIENTES
+    // Métodos para relacionar clientes
+    // ==========================================
+
 
     // Relacionar usuario con Cliente existente
     public User addClienteToUsuario(int id_usuario, Integer cedulaCliente) {
@@ -118,6 +131,12 @@ public class UserService {
         clienteRepository.save(cliente); // Desvincula el cliente
         return userRepository.save(usuario); // Desvincula el usuario
     }
+
+    // ==========================================
+    // CONVERSION A DTO
+    // Métodos para convertir a DTO
+    // ==========================================
+
 
     // Convertir User a UserDTO
     public UserDTO convertToDTO(User user) {

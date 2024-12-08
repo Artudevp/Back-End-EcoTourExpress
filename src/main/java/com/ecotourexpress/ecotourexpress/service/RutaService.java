@@ -22,6 +22,11 @@ public class RutaService {
     @Autowired
     private ActividadRepository actividadRepository;
 
+    // ==========================================
+    // CRUD RUTAS
+    // Métodos para manejar el CRUD
+    // ==========================================
+
     // Crear ruta
     public Ruta saveRuta(Ruta ruta) {
         return rutaRepository.save(ruta);
@@ -42,6 +47,10 @@ public class RutaService {
         rutaRepository.deleteById(id);
     }
 
+    // ==========================================
+    // ACTIVIDADES - RUTAS
+    // Métodos para manejar las actividades
+    // ==========================================
 
     // Agregar actividades a una ruta
     public Ruta addActividadesToRuta(int id_ruta, List<Integer> actividadIds) {

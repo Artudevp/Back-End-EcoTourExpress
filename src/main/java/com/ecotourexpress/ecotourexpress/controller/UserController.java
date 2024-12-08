@@ -34,6 +34,7 @@ import jakarta.validation.Valid;
 @Transactional
 public class UserController {
 
+    // Conexion a servicios y repositorios
     private final UserRepository userRepository;
     private final UserService userService;
     private final AuthService authService;
@@ -45,6 +46,12 @@ public class UserController {
         this.authService = authService;
         this.passwordEncoder = passwordEncoder;
     }
+
+
+    // ==========================================
+    // CRUD USUARIOS
+    // Métodos para manejar las operaciones CRUD
+    // ==========================================
 
     // Obtener lista de usuarios
     @GetMapping
@@ -90,6 +97,11 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.ok("Usuario eliminado correctamente.");
     }
+
+    // ==========================================
+    // USUARIOS - CLIENTES
+    // Métodos para relacionar clientes
+    // ==========================================
 
     // Vincular usuario a cliente existente
     @PostMapping("/{id_usuario}/clientes")

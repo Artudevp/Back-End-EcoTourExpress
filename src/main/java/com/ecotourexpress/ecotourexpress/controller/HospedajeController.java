@@ -29,7 +29,12 @@ public class HospedajeController {
     @Autowired
     private HospedajeService hospedajeService;
 
-    // Obtener lista de hospedaje
+    // ==========================================
+    // CRUD HOSPEDAJE
+    // Métodos para manejar las operaciones CRUD
+    // ==========================================
+
+    // Listar hospedaje
     @GetMapping
     @PreAuthorize("permitAll()")
     public List<Hospedaje> getAllHospedajes() {

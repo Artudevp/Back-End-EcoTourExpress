@@ -12,8 +12,15 @@ import com.ecotourexpress.ecotourexpress.repository.ProductoRepository;
 
 @Service
 public class ProductoService {
+    // Conexion a repositorio
     @Autowired
     private ProductoRepository productoRepository;
+
+    // ==========================================
+    // CRUD PRODUCTOS
+    // Métodos para manejar el CRUD
+    // ==========================================
+
 
     // Crear producto
     public Producto saveProducto(ProductoDTO productoDTO) {

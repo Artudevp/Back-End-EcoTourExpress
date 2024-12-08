@@ -25,8 +25,15 @@ import jakarta.validation.Valid;
 @Transactional
 @RequestMapping("/productos")
 public class ProductoController {
+
+    // Conexion a service
     @Autowired
     private ProductoService productoService;
+
+    // ==========================================
+    // CRUD PRODUCTOS
+    // Métodos para manejar las operaciones CRUD
+    // ==========================================
 
     // Obtener lista de productos
     @GetMapping
@@ -49,8 +56,7 @@ public class ProductoController {
                             producto.isDisponible());
     }
 
-
-
+    // Editar producto por id
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductoDTO> updateProducto(@PathVariable int id, @Valid @RequestBody ProductoDTO productoDetails) {
@@ -75,9 +81,7 @@ public class ProductoController {
             updatedProducto.getDescripcion(),
             updatedProducto.isDisponible()
         ));
-    }
-
-    
+    }    
 
     // Eliminar producto
     @DeleteMapping("/{id}")

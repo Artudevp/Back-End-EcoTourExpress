@@ -31,7 +31,12 @@ public class ActividadController {
     @Autowired
     private ActividadService actividadService;
 
-    // Obtener lista de actividades
+    // ==========================================
+    // CRUD ACTIVIDADES
+    // Métodos para manejar las operaciones CRUD
+    // ==========================================
+
+    // Listar actividades
     @GetMapping
     @PreAuthorize("permitAll()")
     public List<Actividad> getAllActividades() {
