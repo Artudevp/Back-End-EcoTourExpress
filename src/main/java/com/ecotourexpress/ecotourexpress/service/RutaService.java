@@ -44,13 +44,13 @@ public class RutaService {
 
 
     // Agregar actividades a una ruta
-    public Ruta addActividadesToRuta(int id_ruta, List<Actividad> actividades) {
+    public Ruta addActividadesToRuta(int id_ruta, List<Integer> actividadIds) {
         Ruta ruta = rutaRepository.findById(id_ruta)
                 .orElseThrow(() -> new ResourceNotFoundException("Ruta no encontrada con id: " + id_ruta));
         
-        for (Actividad actividad : actividades) {
-            Actividad act = actividadRepository.findById(actividad.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + actividad.getId()));
+        for (Integer actividadId : actividadIds){
+            Actividad act = actividadRepository.findById(actividadId)
+                .orElseThrow(() -> new ResourceNotFoundException("Actividad no encontrada con id: " + actividadId));
             ruta.getActividades().add(act);
         }
 

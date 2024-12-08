@@ -76,8 +76,8 @@ public class RutaController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Ruta> addActividadesToRuta(
             @PathVariable int id_ruta,
-            @RequestBody List<Actividad> actividades) {
-        Ruta updatedRuta = rutaService.addActividadesToRuta(id_ruta, actividades);
+            @RequestBody List<Integer> actividadIds) {
+        Ruta updatedRuta = rutaService.addActividadesToRuta(id_ruta, actividadIds);
         return ResponseEntity.ok(updatedRuta);
     }
 
