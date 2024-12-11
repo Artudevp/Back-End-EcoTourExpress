@@ -81,13 +81,16 @@ public class ClienteController {
     // Métodos para manejar las actividades
     // ==========================================
 
-
     // Obtener todas las actividades de un cliente
     @GetMapping("/{id_cliente}/actividades")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public List<Actividad> getActividadesOfCliente(@PathVariable(required = false) Integer id_cliente) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedClientId(clienteRepository);
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
+
+        AuditoriaUtils.registrarAccion("CONSULTAR", "Actividad", 
+            "El usuario con ID: " + authenticatedUserId + " consultó actividades del cliente con ID: " + finalClientId);
+
         return clienteService.getActividadesOfCliente(finalClientId);
     }
 
@@ -97,11 +100,11 @@ public class ClienteController {
     public ClienteDTO addActividadesToCliente(
             @PathVariable(required = false) Integer id_cliente,
             @RequestBody @Valid List<Integer> actividadIds) {
-            int authenticatedClientId = SecurityUtils.getAuthenticatedClientId(clienteRepository);
-            int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
-        
-        
-        AuditoriaUtils.registrarAccion("ASOCIAR", "Actividad", "Cliente o administrador asoció actividades " + actividadIds + " al cliente con ID: " + finalClientId);
+        int authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
+
+        AuditoriaUtils.registrarAccion("ASOCIAR", "Actividad", 
+            "El usuario con ID: " + authenticatedUserId + " asoció actividades " + actividadIds + " al cliente con ID: " + finalClientId);
 
         return clienteService.addActividadesToCliente(finalClientId, actividadIds);
     }
@@ -112,12 +115,11 @@ public class ClienteController {
     public ClienteDTO removeActividadFromCliente(
             @PathVariable(required = false) Integer id_cliente,
             @PathVariable @Min(1) int id_actividad) {
-            int authenticatedClientId = SecurityUtils.getAuthenticatedClientId(clienteRepository);
-            int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
-    
-        
+        int authenticatedUserId = SecurityUtils.getAuthenticatedUserId();
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
+
         AuditoriaUtils.registrarAccion("ELIMINAR", "Actividad", 
-           "Cliente o administrador eliminó la actividad con ID: " + id_actividad + " del cliente con ID: " + finalClientId);
+            "El usuario con ID: " + authenticatedUserId + " eliminó la actividad con ID: " + id_actividad + " del cliente con ID: " + finalClientId);
 
         return clienteService.removeActividadFromCliente(finalClientId, id_actividad);
     }
@@ -127,43 +129,38 @@ public class ClienteController {
     // Métodos para manejar las rutas
     // ==========================================
 
-    // Obtener las rutas de los clientes
+    // Obtener las rutas de un cliente
     @GetMapping("/{id_cliente}/rutas")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public List<Ruta> getRutasOfCliente(@PathVariable(required = false) Integer id_cliente) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
         return clienteService.getRutasOfCliente(finalClientId);
     }
-    
+
     // Asignar rutas a un cliente
     @PutMapping("/{id_cliente}/rutas")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ClienteDTO addRutasToCliente(
             @PathVariable(required = false) Integer id_cliente,
             @RequestBody @Valid List<Integer> rutaIds) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
         AuditoriaUtils.registrarAccion("ASOCIAR", "Ruta", 
-                String.format("Usuario autenticado con ID %d asoció las rutas %s al cliente con ID: %d",
-                        authenticatedClientId, rutaIds, finalClientId));
+                String.format("Usuario autenticado o administrador asoció las rutas %s al cliente con ID: %d", rutaIds, finalClientId));
 
         return clienteService.addRutasToCliente(finalClientId, rutaIds);
     }
 
-    // Eliminar ruta a un cliente
+    // Eliminar una ruta de un cliente
     @DeleteMapping("/{id_cliente}/rutas/{id_ruta}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ClienteDTO removeRutaFromCliente(
             @PathVariable(required = false) Integer id_cliente,
             @PathVariable @Min(1) int id_ruta) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
         AuditoriaUtils.registrarAccion("ELIMINAR", "Ruta", 
-                String.format("Usuario autenticado con ID %d eliminó la ruta %d del cliente con ID: %d",
-                        authenticatedClientId, id_ruta, finalClientId));
+                String.format("Usuario autenticado o administrador eliminó la ruta con ID: %d del cliente con ID: %d", id_ruta, finalClientId));
 
         return clienteService.removeRutaFromCliente(finalClientId, id_ruta);
     }
@@ -173,42 +170,38 @@ public class ClienteController {
     // Métodos para manejar el hospedaje
     // ==========================================
 
-    // Obtener el hospedaje del cliente
+    // Obtener el hospedaje de un cliente
     @GetMapping("/{id_cliente}/hospedaje")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public Hospedaje getHospedajeOfCliente(@PathVariable(required = false) Integer id_cliente) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
         return clienteService.getHospedajeOfCliente(finalClientId);
     }
 
-    // Asignar hospedaje a cliente
+    // Asignar hospedaje a un cliente
     @PutMapping("/{id_cliente}/hospedaje/{id_hospedaje}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ClienteDTO> addHospedajeToCliente(
             @PathVariable(required = false) Integer id_cliente,
             @PathVariable @Min(1) int id_hospedaje) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
         AuditoriaUtils.registrarAccion("ASOCIAR", "Hospedaje", 
-                String.format("Usuario autenticado con ID %d asignó el hospedaje %d al cliente con ID: %d",
-                        authenticatedClientId, id_hospedaje, finalClientId));
+                String.format("Usuario autenticado o administrador asignó el hospedaje %d al cliente con ID: %d", 
+                        id_hospedaje, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.addHospedajeToCliente(finalClientId, id_hospedaje);
         return ResponseEntity.ok(updatedCliente);
     }
 
-    // Eliminar hospedaje a cliente
+    // Eliminar el hospedaje de un cliente
     @DeleteMapping("/{id_cliente}/hospedaje")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ClienteDTO removeHospedajeFromCliente(@PathVariable(required = false) Integer id_cliente) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
         AuditoriaUtils.registrarAccion("ELIMINAR", "Hospedaje", 
-                String.format("Usuario autenticado con ID %d eliminó el hospedaje del cliente con ID: %d",
-                        authenticatedClientId, finalClientId));
+                String.format("Usuario autenticado o administrador eliminó el hospedaje del cliente con ID: %d", finalClientId));
 
         return clienteService.removeHospedajeFromCliente(finalClientId);
     }
@@ -218,44 +211,41 @@ public class ClienteController {
     // Métodos para manejar los productos
     // ==========================================
 
-    // Obtener productos cliente
+    // Obtener los productos de un cliente
     @GetMapping("/{id_cliente}/productos")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public List<Producto> getProductosOfCliente(@PathVariable(required = false) Integer id_cliente) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
         return clienteService.getProductosOfCliente(finalClientId);
     }
 
-    // Asignar productos a cliente
+    // Asignar productos a un cliente
     @PutMapping("/{id_cliente}/productos")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ClienteDTO> addProductosToCliente(
             @PathVariable(required = false) Integer id_cliente,
             @RequestBody @Valid List<Integer> id_productos) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
         AuditoriaUtils.registrarAccion("ASOCIAR", "Producto", 
-                String.format("Usuario autenticado con ID %d asoció los productos %s al cliente con ID: %d",
-                        authenticatedClientId, id_productos, finalClientId));
+                String.format("Usuario autenticado o administrador asoció los productos %s al cliente con ID: %d", 
+                        id_productos, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.addProductosToCliente(finalClientId, id_productos);
         return ResponseEntity.ok(updatedCliente);
     }
 
-    // Eliminar productos de cliente
+    // Eliminar productos de un cliente
     @DeleteMapping("/{id_cliente}/productos")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ClienteDTO> removeProductosFromCliente(
             @PathVariable(required = false) Integer id_cliente,
             @RequestBody @Valid List<Integer> productoIds) {
-        int authenticatedClientId = SecurityUtils.getAuthenticatedUserId();
-        int finalClientId = SecurityUtils.validateAndGetClientId(id_cliente, authenticatedClientId);
+        int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
         AuditoriaUtils.registrarAccion("ELIMINAR", "Producto", 
-                String.format("Usuario autenticado con ID %d eliminó los productos %s del cliente con ID: %d",
-                        authenticatedClientId, productoIds, finalClientId));
+                String.format("Usuario autenticado o administrador eliminó los productos %s del cliente con ID: %d", 
+                        productoIds, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.removeProductosFromCliente(finalClientId, productoIds);
         return ResponseEntity.ok(updatedCliente);

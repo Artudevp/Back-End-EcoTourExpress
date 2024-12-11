@@ -42,10 +42,27 @@ public class SecurityUtils {
     }
 
     public static int getAuthenticatedClientId(ClienteRepository clienteRepository) {
+        if (isAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Los administradores no tienen cliente asociado.");
+        }
         int authenticatedUserId = getAuthenticatedUserId();
         Cliente cliente = clienteRepository.findByUsuarioId(authenticatedUserId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Cliente no asociado al usuario autenticado"));
         return cliente.getId();
     }
+
+    public static int resolveClientId(Integer requestClientId, ClienteRepository clienteRepository) {
+        if (isAdmin()) {
+            if (requestClientId == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El ID del cliente debe ser proporcionado para administradores.");
+            }
+            return requestClientId;
+        } else {
+            int authenticatedClientId = getAuthenticatedClientId(clienteRepository);
+            return validateAndGetClientId(requestClientId, authenticatedClientId);
+        }
+    }
+    
+    
 
 }
