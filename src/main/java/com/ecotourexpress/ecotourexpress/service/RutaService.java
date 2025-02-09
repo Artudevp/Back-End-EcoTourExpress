@@ -2,6 +2,7 @@ package com.ecotourexpress.ecotourexpress.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,9 +33,19 @@ public class RutaService {
         return rutaRepository.save(ruta);
     }
 
-    // Mostrar todas las rutas
+    // Mostrar todas las rutas e imagenes
     public List<Ruta> getAllRutas() {
-        return (List<Ruta>) rutaRepository.findAll();
+        List<Ruta> rutas = rutaRepository.findAll();
+    
+        rutas.forEach(ruta -> {
+            List<String> actividadMediaUrls = ruta.getActividades().stream()
+                .flatMap(actividad -> actividad.getMediaUrls().stream())
+                .collect(Collectors.toList());
+    
+            ruta.setActividadMediaUrls(actividadMediaUrls);
+        });
+    
+        return rutas;
     }
 
     // Seleccionar ruta por ID (Para editar)

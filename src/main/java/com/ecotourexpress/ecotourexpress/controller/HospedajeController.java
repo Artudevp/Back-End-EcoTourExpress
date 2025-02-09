@@ -1,5 +1,6 @@
 package com.ecotourexpress.ecotourexpress.controller;
 
+import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,16 +10,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.ecotourexpress.ecotourexpress.config.exception.ResourceNotFoundException;
 import com.ecotourexpress.ecotourexpress.model.Hospedaje;
 import com.ecotourexpress.ecotourexpress.service.HospedajeService;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 
 @RestController
 @Transactional
@@ -44,26 +44,46 @@ public class HospedajeController {
     // Agregar o actualizar Hospedaje
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Hospedaje newHospedaje(@Valid @RequestBody Hospedaje hospedaje) {
+    public ResponseEntity<Hospedaje> newHospedaje(
+            @RequestParam("tipo") String tipo,
+            @RequestParam("capacidad") int capacidad,
+            @RequestParam("cantidad") int cantidad,
+            @RequestParam("precio") int precio,
+            @RequestParam("descripcion") String descripcion,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files) throws IOException {
+
+        Hospedaje hospedaje = new Hospedaje();
+        hospedaje.setTipo(tipo);
+        hospedaje.setCapacidad(capacidad);
+        hospedaje.setCantidad(cantidad);
+        hospedaje.setPrecio(precio);
+        hospedaje.setDescripcion(descripcion);
         hospedaje.setDisponible(true);
-        return hospedajeService.saveHospedaje(hospedaje);
+
+        Hospedaje savedHospedaje = hospedajeService.saveHospedaje(hospedaje, files);
+        return ResponseEntity.ok(savedHospedaje);
     }
 
     // Seleccionar hospedaje por ID (Editar)
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Hospedaje> updateHospedaje(@PathVariable int id, @Valid @RequestBody Hospedaje hospedajeDetails) {
-        Hospedaje hospedaje = hospedajeService.getHospedajeById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Hospedaje no encontrado con id: " + id));
+    public ResponseEntity<Hospedaje> updateHospedaje(
+            @PathVariable int id,
+            @RequestParam("tipo") String tipo,
+            @RequestParam("capacidad") int capacidad,
+            @RequestParam("cantidad") int cantidad,
+            @RequestParam("precio") int precio,
+            @RequestParam("descripcion") String descripcion,
+            @RequestParam(value = "files", required = false) List<MultipartFile> newFiles) throws IOException {
 
-        hospedaje.setTipo(hospedajeDetails.getTipo());
-        hospedaje.setCapacidad(hospedajeDetails.getCapacidad());
-        hospedaje.setCantidad(hospedajeDetails.getCantidad());
-        hospedaje.setPrecio(hospedajeDetails.getPrecio());
-        hospedaje.setDisponible(true);
-        hospedaje.setDescripcion(hospedajeDetails.getDescripcion());
+        Hospedaje hospedajeDetails = new Hospedaje();
+        hospedajeDetails.setTipo(tipo);
+        hospedajeDetails.setCapacidad(capacidad);
+        hospedajeDetails.setCantidad(cantidad);
+        hospedajeDetails.setPrecio(precio);
+        hospedajeDetails.setDescripcion(descripcion);
 
-        final Hospedaje updatedHospedaje = hospedajeService.saveHospedaje(hospedaje);
+        Hospedaje updatedHospedaje = hospedajeService.updateHospedaje(id, hospedajeDetails, newFiles);
         return ResponseEntity.ok(updatedHospedaje);
     }
 

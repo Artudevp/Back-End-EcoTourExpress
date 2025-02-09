@@ -145,8 +145,8 @@ public class ClienteController {
             @RequestBody @Valid List<Integer> rutaIds) {
         int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
-        AuditoriaUtils.registrarAccion("ASOCIAR", "Ruta", 
-                String.format("Usuario autenticado o administrador asoció las rutas %s al cliente con ID: %d", rutaIds, finalClientId));
+        AuditoriaUtils.registrarAccion("ASOCIAR", "Ruta",
+                "Usuario autenticado o administrador asoció las rutas %s al cliente con ID: %d".formatted(rutaIds, finalClientId));
 
         return clienteService.addRutasToCliente(finalClientId, rutaIds);
     }
@@ -159,8 +159,8 @@ public class ClienteController {
             @PathVariable @Min(1) int id_ruta) {
         int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
-        AuditoriaUtils.registrarAccion("ELIMINAR", "Ruta", 
-                String.format("Usuario autenticado o administrador eliminó la ruta con ID: %d del cliente con ID: %d", id_ruta, finalClientId));
+        AuditoriaUtils.registrarAccion("ELIMINAR", "Ruta",
+                "Usuario autenticado o administrador eliminó la ruta con ID: %d del cliente con ID: %d".formatted(id_ruta, finalClientId));
 
         return clienteService.removeRutaFromCliente(finalClientId, id_ruta);
     }
@@ -186,8 +186,8 @@ public class ClienteController {
             @PathVariable @Min(1) int id_hospedaje) {
         int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
-        AuditoriaUtils.registrarAccion("ASOCIAR", "Hospedaje", 
-                String.format("Usuario autenticado o administrador asignó el hospedaje %d al cliente con ID: %d", 
+        AuditoriaUtils.registrarAccion("ASOCIAR", "Hospedaje",
+                "Usuario autenticado o administrador asignó el hospedaje %d al cliente con ID: %d".formatted(
                         id_hospedaje, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.addHospedajeToCliente(finalClientId, id_hospedaje);
@@ -200,8 +200,8 @@ public class ClienteController {
     public ClienteDTO removeHospedajeFromCliente(@PathVariable(required = false) Integer id_cliente) {
         int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
-        AuditoriaUtils.registrarAccion("ELIMINAR", "Hospedaje", 
-                String.format("Usuario autenticado o administrador eliminó el hospedaje del cliente con ID: %d", finalClientId));
+        AuditoriaUtils.registrarAccion("ELIMINAR", "Hospedaje",
+                "Usuario autenticado o administrador eliminó el hospedaje del cliente con ID: %d".formatted(finalClientId));
 
         return clienteService.removeHospedajeFromCliente(finalClientId);
     }
@@ -227,8 +227,8 @@ public class ClienteController {
             @RequestBody @Valid List<Integer> id_productos) {
         int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
-        AuditoriaUtils.registrarAccion("ASOCIAR", "Producto", 
-                String.format("Usuario autenticado o administrador asoció los productos %s al cliente con ID: %d", 
+        AuditoriaUtils.registrarAccion("ASOCIAR", "Producto",
+                "Usuario autenticado o administrador asoció los productos %s al cliente con ID: %d".formatted(
                         id_productos, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.addProductosToCliente(finalClientId, id_productos);
@@ -243,8 +243,8 @@ public class ClienteController {
             @RequestBody @Valid List<Integer> productoIds) {
         int finalClientId = SecurityUtils.resolveClientId(id_cliente, clienteRepository);
 
-        AuditoriaUtils.registrarAccion("ELIMINAR", "Producto", 
-                String.format("Usuario autenticado o administrador eliminó los productos %s del cliente con ID: %d", 
+        AuditoriaUtils.registrarAccion("ELIMINAR", "Producto",
+                "Usuario autenticado o administrador eliminó los productos %s del cliente con ID: %d".formatted(
                         productoIds, finalClientId));
 
         ClienteDTO updatedCliente = clienteService.removeProductosFromCliente(finalClientId, productoIds);

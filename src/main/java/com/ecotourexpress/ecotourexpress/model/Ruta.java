@@ -43,6 +43,9 @@ public class Ruta {
     @Column
     private boolean disponible;
 
+    @Transient
+    private List<String> actividadMediaUrls;
+
     @ManyToMany(mappedBy = "rutas")
     @JsonIgnore
     private List<Cliente> clientes;

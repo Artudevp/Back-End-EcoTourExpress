@@ -6,12 +6,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Producto {
 
     @Id
@@ -41,6 +44,11 @@ public class Producto {
 
     @Column
     private boolean disponible;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "producto_media", joinColumns = @JoinColumn(name = "producto_id"))
+    @Column(name = "media_url")
+    private List<String> mediaUrls = new ArrayList<>();
 
     @ManyToMany (mappedBy = "productos")
     @JsonIgnore

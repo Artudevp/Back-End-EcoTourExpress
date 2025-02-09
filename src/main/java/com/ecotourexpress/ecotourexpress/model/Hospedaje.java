@@ -1,8 +1,10 @@
 package com.ecotourexpress.ecotourexpress.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -12,6 +14,7 @@ import lombok.Data;
 
 @Entity
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Hospedaje {
 
     @Id
@@ -43,7 +46,10 @@ public class Hospedaje {
     @Column
     private boolean disponible;
 
-    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "hospedaje_media", joinColumns = @JoinColumn(name = "hospedaje_id"))
+    @Column(name = "media_url")
+    private List<String> mediaUrls = new ArrayList<>();
 
     @OneToMany(mappedBy = "habitacion")
     @JsonIgnore

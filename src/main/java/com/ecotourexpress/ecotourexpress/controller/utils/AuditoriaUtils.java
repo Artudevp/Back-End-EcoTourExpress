@@ -2,7 +2,6 @@ package com.ecotourexpress.ecotourexpress.controller.utils;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,6 @@ public class AuditoriaUtils {
 
     private static AuditoriaRepository auditoriaRepository;
 
-    @Autowired
     public AuditoriaUtils(AuditoriaRepository auditoriaRepository) {
         AuditoriaUtils.auditoriaRepository = auditoriaRepository;
     }
